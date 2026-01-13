@@ -1,4 +1,4 @@
-# app.py — mobile-first + UX upgrades (next envelope, quick notebook, auto-collapse sidebar)
+# app.py — mobile-first + UX upgrades + MENU FUNCIONAL (popover)
 import json
 import io
 import binascii
@@ -15,7 +15,7 @@ st.set_page_config(
     page_title="Pousada Aurora — Investigação",
     page_icon="🕵️",
     layout="wide",
-    initial_sidebar_state="collapsed",  # abre recolhida
+    initial_sidebar_state="collapsed",  # sidebar fica recolhida e não é necessária
 )
 
 ROOT = Path(__file__).parent
@@ -28,39 +28,23 @@ BRAND = {
 }
 
 # ---------------------------
-# CSS — mobile UX + sidebar hide
+# CSS — mobile UX
 # ---------------------------
-def apply_css(hide_sidebar: bool):
-    hide_css = ""
-    if hide_sidebar:
-        # Esconde sidebar completamente (mobile-friendly)
-        hide_css = """
-        [data-testid="stSidebar"] { display: none !important; }
-        [data-testid="stSidebarNav"] { display: none !important; }
-        """
-    st.markdown(
-        f"""
+st.markdown(
+    """
 <style>
-/* Base spacing */
-.block-container {{ padding-top: 1rem; padding-bottom: 1.5rem; }}
-
-/* Tappable controls */
-div[role="radiogroup"] label {{ padding: 8px 10px; border-radius: 10px; }}
-.stButton button {{ padding: 0.65rem 0.95rem; border-radius: 12px; }}
-
-/* Mobile typography */
-@media (max-width: 768px) {{
-  h1 {{ font-size: 1.6rem !important; }}
-  h2 {{ font-size: 1.25rem !important; }}
-  h3 {{ font-size: 1.05rem !important; }}
-  .block-container {{ padding-left: 0.9rem; padding-right: 0.9rem; }}
-}}
-
-{hide_css}
+.block-container { padding-top: 1rem; padding-bottom: 1.5rem; }
+.stButton button { padding: 0.65rem 0.95rem; border-radius: 12px; }
+@media (max-width: 768px) {
+  h1 { font-size: 1.6rem !important; }
+  h2 { font-size: 1.25rem !important; }
+  h3 { font-size: 1.05rem !important; }
+  .block-container { padding-left: 0.9rem; padding-right: 0.9rem; }
+}
 </style>
 """,
-        unsafe_allow_html=True,
-    )
+    unsafe_allow_html=True,
+)
 
 # ---------------------------
 # Helpers
@@ -128,9 +112,7 @@ def init_state():
         "submitted_at": None,
     }
 
-    # NEW: nav state + sidebar visibility
     st.session_state.nav_page = "🏠 Início"
-    st.session_state.hide_sidebar = True  # por padrão, escondemos no mobile (pode abrir via botão ☰)
 
 def reset_state():
     for k in list(st.session_state.keys()):
@@ -172,10 +154,8 @@ IMG = {
     "closing": pick_image("closing"),
 }
 
-apply_css(st.session_state.hide_sidebar)
-
 # ---------------------------
-# Top bar (works even when sidebar hidden)
+# TOP BAR with REAL menu (popover)
 # ---------------------------
 top = st.container()
 with top:
@@ -183,62 +163,39 @@ with top:
     with colA:
         st.caption(f"© {BRAND['studio']}")
     with colB:
-        # Quick access menu toggle
-        if st.button("☰ Menu", use_container_width=True):
-            st.session_state.hide_sidebar = not st.session_state.hide_sidebar
-            st.rerun()
-    with colC:
         if st.session_state.started:
-            if st.button("🗒️ Caderno", use_container_width=True):
-                go("🗒️ Caderno")
+            prog = st.session_state.max_opened_envelope / 6
+            st.progress(prog, text=f"{int(prog*100)}%")
+        else:
+            st.caption(BRAND["tagline"])
+    with colC:
+        with st.popover("☰ Menu", use_container_width=True):
+            pages = ["🏠 Início", "📦 Envelopes", "🗒️ Caderno", "✅ Decisão", "🔒 Fechamento"]
+            current = st.session_state.nav_page
+            idx = pages.index(current) if current in pages else 0
+
+            sel = st.radio("Ir para", pages, index=idx)
+            if sel != st.session_state.nav_page:
+                st.session_state.nav_page = sel
+                st.rerun()
+
+            st.divider()
+
+            if not st.session_state.started:
+                st.info("Comece pelo caso.")
+                if st.button("▶️ Iniciar caso", use_container_width=True):
+                    st.session_state.started = True
+                    st.session_state.max_opened_envelope = 1
+                    st.session_state.current_env = 1
+                    st.session_state.nav_page = "📦 Envelopes"
+                    st.rerun()
+            else:
+                if st.button("🗒️ Abrir Caderno", use_container_width=True):
+                    go("🗒️ Caderno")
+                if st.button("🔄 Reiniciar caso", use_container_width=True):
+                    reset_state()
 
 st.divider()
-
-# ---------------------------
-# Sidebar (optional; can be hidden by CSS)
-# ---------------------------
-with st.sidebar:
-    st.markdown("## 🕵️ Pousada Aurora")
-    st.caption(BRAND["tagline"])
-    st.divider()
-
-    if not st.session_state.started:
-        st.info("Clique para iniciar e liberar o Envelope 1.")
-        if st.button("▶️ Iniciar caso", use_container_width=True):
-            st.session_state.started = True
-            st.session_state.max_opened_envelope = 1
-            st.session_state.current_env = 1
-            st.session_state.nav_page = "📦 Envelopes"
-
-            # NEW: ao iniciar, recolher/hide automaticamente
-            st.session_state.hide_sidebar = True
-            st.rerun()
-    else:
-        st.success("Caso em andamento")
-        prog = st.session_state.max_opened_envelope / 6
-        st.progress(prog, text=f"Progresso: {int(prog*100)}%")
-        cols = st.columns(2)
-        cols[0].metric("Envelopes", f"{st.session_state.max_opened_envelope}/6")
-        cols[1].metric("Decisão", "✅" if st.session_state.decision_submitted else "—")
-
-    st.divider()
-
-    # Nav radio - stateful
-    pages = ["🏠 Início", "📦 Envelopes", "🗒️ Caderno", "✅ Decisão", "🔒 Fechamento"]
-    idx = pages.index(st.session_state.nav_page) if st.session_state.nav_page in pages else 0
-    sel = st.radio("Navegação", pages, index=idx)
-    if sel != st.session_state.nav_page:
-        st.session_state.nav_page = sel
-        st.rerun()
-
-    st.divider()
-    st.markdown("### 📌 Suspeitos")
-    for name, data in st.session_state.suspects.items():
-        st.write(f"{badge(data['status'])} **{name}** — {data['status']}")
-
-    st.divider()
-    if st.button("🔄 Reiniciar caso", use_container_width=True):
-        reset_state()
 
 # ---------------------------
 # Pages
@@ -259,7 +216,7 @@ def page_home():
         st.warning("Regra central: você só vê o fechamento **depois de decidir**.")
 
     if not st.session_state.started:
-        st.info("Inicie o caso pelo Menu (☰) e clique em **Iniciar caso**.")
+        st.info("Abra o **☰ Menu** e clique em **Iniciar caso**.")
     else:
         st.success("Caso iniciado. Vá para **Envelopes**.")
 
@@ -268,7 +225,6 @@ def page_envelopes():
     st.markdown("## 📦 Envelopes")
     st.caption("Abra na ordem. Confirme leitura para liberar o próximo.")
 
-    # Lista de envelopes (mobile-friendly)
     with st.container(border=True):
         st.markdown("### Ordem de abertura")
         for env in content["envelopes"]:
@@ -303,32 +259,29 @@ def page_envelopes():
         }
         st.markdown(prompts.get(env_id, "-"))
 
-    # Actions: Confirm -> Next envelope -> Quick notebook
     st.divider()
 
-    # 1) Confirm reading
+    # Confirm reading
     if st.button("✅ Confirmar leitura", use_container_width=True):
         if st.session_state.max_opened_envelope == env_id and env_id < 6:
             st.session_state.max_opened_envelope += 1
         st.toast("Leitura confirmada.")
         st.rerun()
 
-    # 2) Next envelope button (below confirm)
+    # Next envelope button (below confirmation)
     next_id = min(env_id + 1, 6)
     next_allowed = can_open(next_id)
-    next_label = f"➡️ Próximo envelope (Envelope {next_id})" if env_id < 6 else "➡️ Próximo envelope (fim)"
     if env_id >= 6:
-        st.button(next_label, disabled=True, use_container_width=True)
+        st.button("➡️ Próximo envelope (fim)", disabled=True, use_container_width=True)
     else:
-        if st.button(next_label, disabled=not next_allowed, use_container_width=True):
+        if st.button(f"➡️ Próximo envelope (Envelope {next_id})", disabled=not next_allowed, use_container_width=True):
             st.session_state.current_env = next_id
             st.rerun()
 
-    # 3) Quick access notebook
+    # Quick notebook access
     if st.button("🗒️ Abrir Caderno do Investigador", use_container_width=True):
         go("🗒️ Caderno")
 
-    # Bonus: quick hypothesis popover
     with st.popover("🧠 Hipótese rápida"):
         txt = st.text_input("Escreva curto e objetivo", key="hyp_fast")
         if st.button("Salvar hipótese", use_container_width=True) and txt.strip():
