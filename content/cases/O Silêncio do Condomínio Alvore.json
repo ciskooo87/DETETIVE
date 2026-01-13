@@ -1,5 +1,17 @@
 {
-  "case_title": "O Silêncio do Condomínio Alvore",
+  "case": {
+    "slug": "condominio-alvore",
+    "title": "O Silêncio do Condomínio Alvore",
+    "subtitle": "Uma morte tratada como natural — e reaberta quando o padrão de omissões começa a falar.",
+    "suspects": [
+      "Carlos Henrique Nogueira (Síndico profissional)",
+      "Renato Alves de Lima (Supervisor da segurança)",
+      "Eduardo Farias (Técnico de manutenção elétrica)",
+      "Paula Mendes (Moradora — 1702)",
+      "Marcelo Pires (Morador — 1705)",
+      "Maria de Fátima Oliveira (Funcionária de limpeza)"
+    ]
+  },
   "envelopes": [
     {
       "id": 1,
