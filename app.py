@@ -1,7 +1,6 @@
-# app.py — mobile-first + UX upgrades + MENU FUNCIONAL (popover)
+# app.py — mobile-first + UX upgrades + sticky header menu + auto-collapse + CTA no Envelope 6
 import json
 import io
-import binascii
 from pathlib import Path
 from datetime import datetime
 
@@ -15,7 +14,7 @@ st.set_page_config(
     page_title="Pousada Aurora — Investigação",
     page_icon="🕵️",
     layout="wide",
-    initial_sidebar_state="collapsed",  # sidebar fica recolhida e não é necessária
+    initial_sidebar_state="collapsed",
 )
 
 ROOT = Path(__file__).parent
@@ -28,13 +27,28 @@ BRAND = {
 }
 
 # ---------------------------
-# CSS — mobile UX
+# CSS — mobile UX + sticky header
 # ---------------------------
 st.markdown(
     """
 <style>
-.block-container { padding-top: 1rem; padding-bottom: 1.5rem; }
+/* Base spacing */
+.block-container { padding-top: 1rem; padding-bottom: 1.25rem; }
 .stButton button { padding: 0.65rem 0.95rem; border-radius: 12px; }
+
+/* Sticky header: make the FIRST main block sticky */
+.main .block-container > div:first-child {
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  background: var(--background-color);
+  backdrop-filter: blur(10px);
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid rgba(128,128,128,0.25);
+}
+
+/* Mobile typography */
 @media (max-width: 768px) {
   h1 { font-size: 1.6rem !important; }
   h2 { font-size: 1.25rem !important; }
@@ -155,7 +169,7 @@ IMG = {
 }
 
 # ---------------------------
-# TOP BAR with REAL menu (popover)
+# Sticky TOP BAR with always-collapsed popover menu
 # ---------------------------
 top = st.container()
 with top:
@@ -169,6 +183,7 @@ with top:
         else:
             st.caption(BRAND["tagline"])
     with colC:
+        # Popover always starts collapsed; any action reruns -> closes automatically
         with st.popover("☰ Menu", use_container_width=True):
             pages = ["🏠 Início", "📦 Envelopes", "🗒️ Caderno", "✅ Decisão", "🔒 Fechamento"]
             current = st.session_state.nav_page
@@ -182,7 +197,6 @@ with top:
             st.divider()
 
             if not st.session_state.started:
-                st.info("Comece pelo caso.")
                 if st.button("▶️ Iniciar caso", use_container_width=True):
                     st.session_state.started = True
                     st.session_state.max_opened_envelope = 1
@@ -191,7 +205,8 @@ with top:
                     st.rerun()
             else:
                 if st.button("🗒️ Abrir Caderno", use_container_width=True):
-                    go("🗒️ Caderno")
+                    st.session_state.nav_page = "🗒️ Caderno"
+                    st.rerun()
                 if st.button("🔄 Reiniciar caso", use_container_width=True):
                     reset_state()
 
@@ -281,6 +296,12 @@ def page_envelopes():
     # Quick notebook access
     if st.button("🗒️ Abrir Caderno do Investigador", use_container_width=True):
         go("🗒️ Caderno")
+
+    # NEW: CTA on last envelope BEFORE closure/answer -> go to decision page
+    if env_id == 6:
+        st.warning("Você chegou ao último envelope. Próximo passo: declarar sua conclusão.")
+        if st.button("✅ Ir para minha decisão", use_container_width=True):
+            go("✅ Decisão")
 
     with st.popover("🧠 Hipótese rápida"):
         txt = st.text_input("Escreva curto e objetivo", key="hyp_fast")
