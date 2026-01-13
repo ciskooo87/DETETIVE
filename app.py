@@ -8,6 +8,10 @@ from datetime import datetime
 
 import streamlit as st
 
+import io
+from PIL import Image, UnidentifiedImageError
+
+
 # ---------------------------
 # Config
 # ---------------------------
@@ -23,16 +27,24 @@ CONTENT_PATH = ROOT / "content" / "envelopes_ptbr.json"
 ASSETS = ROOT / "assets" / "images"
 
 # Nomes esperados das imagens (coloque arquivos com esses nomes em assets/images/)
+def pick_image(stem: str) -> Path | None:
+    for ext in ("jpg", "jpeg", "png", "webp"):
+        p = ASSETS / f"{stem}.{ext}"
+        if p.exists():
+            return p
+    return None
+
 IMG = {
-    "cover": ASSETS / "cover.jpg",
-    1: ASSETS / "envelope1.jpg",
-    2: ASSETS / "envelope2.jpg",
-    3: ASSETS / "envelope3.jpg",
-    4: ASSETS / "envelope4.jpg",
-    5: ASSETS / "envelope5.jpg",
-    6: ASSETS / "envelope6.jpg",
-    "closing": ASSETS / "closing.jpg",
+    "cover": pick_image("cover"),
+    1: pick_image("envelope1"),
+    2: pick_image("envelope2"),
+    3: pick_image("envelope3"),
+    4: pick_image("envelope4"),
+    5: pick_image("envelope5"),
+    6: pick_image("envelope6"),
+    "closing": pick_image("closing"),
 }
+
 
 BRAND = {
     "studio": "Aurora Narrative Games",
@@ -54,10 +66,28 @@ def load_content() -> dict:
         return json.load(f)
 
 
-def safe_image(path: Path, caption: str | None = None, height: int | None = None):
-    """Renderiza imagem se existir; caso contrário, ignora sem quebrar o app."""
-    if path and path.exists():
-        st.image(str(path), use_container_width=True, caption=caption)
+def safe_image(path: Path, caption: str | None = None):
+    """Renderiza imagem se existir e for válida. Se não, não quebra o app."""
+    if not path:
+        return
+    if not path.exists():
+        return
+
+    try:
+        data = path.read_bytes()
+        img = Image.open(io.BytesIO(data))
+        img.verify()  # valida estrutura
+
+        # reabre após verify
+        img = Image.open(io.BytesIO(data))
+        st.image(img, use_container_width=True, caption=caption)
+
+    except (UnidentifiedImageError, OSError, ValueError):
+        # fallback visual, sem quebrar o app
+        with st.container(border=True):
+            st.caption("Imagem indisponível (arquivo inválido).")
+            st.code(str(path))
+
     else:
         # Mantém o layout sem poluir demais
         st.caption("")
