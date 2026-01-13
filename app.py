@@ -447,14 +447,32 @@ def page_decision():
 
     st.warning("Momento da decisão: preencha tudo. Sem campos vazios.")
 
+    # ⚠️ SELECTBOX FORA DO CARD (fix mobile)
     suspects_list = [""] + list(cs["suspects"].keys()) + ["Outro/Indeterminado"]
+    culprit = st.selectbox(
+        "Quem é o culpado?",
+        suspects_list,
+        index=0,
+        key=f"culprit_{case_slug}",
+    )
 
+    # CARD apenas para inputs de texto + botão
     with st.container(border=True):
         with st.form(f"decision_form_{case_slug}"):
-            culprit = st.selectbox("Quem é o culpado?", suspects_list, index=0)
-            method = st.text_input("Como foi o crime? (método/objeto/dinâmica)")
-            motive = st.text_input("Qual foi o motivo?")
-            reasoning = st.text_area("Justificativa", height=160)
+            method = st.text_input(
+                "Como foi o crime? (método / dinâmica)",
+                key=f"method_{case_slug}",
+            )
+            motive = st.text_input(
+                "Qual foi o motivo?",
+                key=f"motive_{case_slug}",
+            )
+            reasoning = st.text_area(
+                "Justificativa (por que sua hipótese explica melhor as provas?)",
+                height=160,
+                key=f"reasoning_{case_slug}",
+            )
+
             ok = st.form_submit_button("📌 Enviar decisão")
 
             if ok:
