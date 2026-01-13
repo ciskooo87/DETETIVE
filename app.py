@@ -45,28 +45,6 @@ IMG = {
     "closing": pick_image("closing"),
 }
 
-import os
-import binascii
-
-def debug_asset(path: Path):
-    if path is None:
-        return {"exists": False, "path": None, "size": None, "head": None}
-    exists = path.exists()
-    size = path.stat().st_size if exists else None
-    head = None
-    if exists:
-        b = path.read_bytes()[:16]
-        head = binascii.hexlify(b).decode("utf-8")
-    return {"exists": exists, "path": str(path), "size": size, "head": head}
-
-with st.sidebar:
-    with st.expander("🧪 Diagnóstico de imagens (debug)", expanded=False):
-        for key in ["cover", "closing"]:
-            info = debug_asset(IMG.get(key))
-            st.write(key, info)
-        for i in range(1, 7):
-            info = debug_asset(IMG.get(i))
-            st.write(f"env{i}", info)
 
 BRAND = {
     "studio": "Aurora Narrative Games",
