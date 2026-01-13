@@ -1,4 +1,10 @@
-{
+  {
+  "case": {
+    "slug": "pousada-aurora",
+    "title": "O Incidente da Pousada Aurora",
+    "subtitle": "Uma investigação narrativa com informação fragmentada.",
+    "suspects": ["Daniel Moreira", "Laura Moreira", "Proprietário (Sr. Álvaro)"]
+    {
   "case_title": "O Incidente da Pousada Aurora",
   "envelopes": [
     {
