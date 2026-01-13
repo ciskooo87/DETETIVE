@@ -1,4 +1,3 @@
-# app.py — mobile-first + UX upgrades + sticky header menu + auto-collapse + CTA no Envelope 6
 import json
 import io
 from pathlib import Path
@@ -11,19 +10,19 @@ from PIL import Image, UnidentifiedImageError
 # Config
 # ---------------------------
 st.set_page_config(
-    page_title="Pousada Aurora — Investigação",
+    page_title="Detetive — Casos Interativos",
     page_icon="🕵️",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
 
 ROOT = Path(__file__).parent
-CONTENT_PATH = ROOT / "content" / "envelopes_ptbr.json"
+CASES_DIR = ROOT / "content" / "cases"
 ASSETS = ROOT / "assets" / "images"
 
 BRAND = {
     "studio": "Aurora Narrative Games",
-    "tagline": "Experiência de investigação. Decida antes da verdade.",
+    "tagline": "Casos interativos. Decida antes da verdade.",
 }
 
 # ---------------------------
@@ -32,11 +31,9 @@ BRAND = {
 st.markdown(
     """
 <style>
-/* Base spacing */
 .block-container { padding-top: 1rem; padding-bottom: 1.25rem; }
 .stButton button { padding: 0.65rem 0.95rem; border-radius: 12px; }
 
-/* Sticky header: make the FIRST main block sticky */
 .main .block-container > div:first-child {
   position: sticky;
   top: 0;
@@ -48,7 +45,6 @@ st.markdown(
   border-bottom: 1px solid rgba(128,128,128,0.25);
 }
 
-/* Mobile typography */
 @media (max-width: 768px) {
   h1 { font-size: 1.6rem !important; }
   h2 { font-size: 1.25rem !important; }
@@ -61,21 +57,34 @@ st.markdown(
 )
 
 # ---------------------------
-# Helpers
+# Helpers — Cases
 # ---------------------------
-def load_content() -> dict:
-    if not CONTENT_PATH.exists():
-        st.error(
-            f"Arquivo de conteúdo não encontrado: {CONTENT_PATH}\n\n"
-            "Crie content/envelopes_ptbr.json (use o JSON do caso)."
-        )
-        st.stop()
-    with open(CONTENT_PATH, "r", encoding="utf-8") as f:
-        return json.load(f)
+def list_cases() -> list[dict]:
+    """Returns list of cases with slug + title."""
+    if not CASES_DIR.exists():
+        return []
+    cases = []
+    for p in sorted(CASES_DIR.glob("*.json")):
+        try:
+            data = json.loads(p.read_text(encoding="utf-8"))
+            slug = data.get("case", {}).get("slug") or p.stem
+            title = data.get("case", {}).get("title") or slug
+            cases.append({"slug": slug, "title": title, "path": p})
+        except Exception:
+            continue
+    return cases
 
-def pick_image(stem: str) -> Path | None:
+def load_case(case_path: Path) -> dict:
+    if not case_path.exists():
+        st.error(f"Arquivo do caso não encontrado: {case_path}")
+        st.stop()
+    return json.loads(case_path.read_text(encoding="utf-8"))
+
+def pick_image(case_slug: str, stem: str) -> Path | None:
+    # Busca em assets/images/<slug>/<stem>.<ext>
+    base = ASSETS / case_slug
     for ext in ("jpg", "jpeg", "png", "webp"):
-        p = ASSETS / f"{stem}.{ext}"
+        p = base / f"{stem}.{ext}"
         if p.exists():
             return p
     return None
@@ -98,11 +107,18 @@ def badge(status: str) -> str:
     m = {"Neutro": "⚪", "Suspeito": "🟠", "Prioritário": "🔴", "Descartado": "🟢"}
     return m.get(status, "⚪")
 
+# ---------------------------
+# State
+# ---------------------------
 def init_state():
     if "initialized" in st.session_state:
         return
     st.session_state.initialized = True
 
+    st.session_state.case_slug = None
+    st.session_state.nav_page = "🏠 Início"
+
+    # gameplay
     st.session_state.started = False
     st.session_state.current_env = 1
     st.session_state.max_opened_envelope = 0
@@ -111,11 +127,31 @@ def init_state():
     st.session_state.timeline = []
     st.session_state.hypotheses = []
 
-    st.session_state.suspects = {
-        "Daniel Moreira": {"status": "Neutro", "notes": ""},
-        "Laura Moreira": {"status": "Neutro", "notes": ""},
-        "Proprietário (Sr. Álvaro)": {"status": "Neutro", "notes": ""},
+    st.session_state.suspects = {}  # será preenchido pelo caso
+    st.session_state.decision_submitted = False
+    st.session_state.decision = {
+        "culprit": "",
+        "method": "",
+        "motive": "",
+        "reasoning": "",
+        "submitted_at": None,
     }
+
+def reset_gameplay_for_case(case_data: dict):
+    """Reseta apenas o progresso do jogo quando troca/inicia caso."""
+    st.session_state.started = False
+    st.session_state.current_env = 1
+    st.session_state.max_opened_envelope = 0
+
+    st.session_state.notes = ""
+    st.session_state.timeline = []
+    st.session_state.hypotheses = []
+
+    # suspects: do caso (ou fallback)
+    suspects = case_data.get("case", {}).get("suspects") or [
+        "Daniel Moreira", "Laura Moreira", "Proprietário (Sr. Álvaro)"
+    ]
+    st.session_state.suspects = {s: {"status": "Neutro", "notes": ""} for s in suspects}
 
     st.session_state.decision_submitted = False
     st.session_state.decision = {
@@ -126,15 +162,19 @@ def init_state():
         "submitted_at": None,
     }
 
-    st.session_state.nav_page = "🏠 Início"
-
-def reset_state():
-    for k in list(st.session_state.keys()):
-        del st.session_state[k]
+def go(page_name: str):
+    st.session_state.nav_page = page_name
     st.rerun()
 
-def envelope_by_id(content: dict, env_id: int) -> dict:
-    return next(e for e in content["envelopes"] if e["id"] == env_id)
+def require_case_loaded(case_data: dict):
+    if not case_data:
+        st.warning("Selecione um caso no menu (☰).")
+        st.stop()
+
+def require_started():
+    if not st.session_state.started:
+        st.warning("Inicie o caso pelo menu (☰) para acessar esta área.")
+        st.stop()
 
 def can_open(env_id: int) -> bool:
     return env_id <= st.session_state.max_opened_envelope
@@ -142,34 +182,45 @@ def can_open(env_id: int) -> bool:
 def all_unlocked() -> bool:
     return st.session_state.max_opened_envelope >= 6
 
-def require_started():
-    if not st.session_state.started:
-        st.warning("Inicie o caso para acessar esta área.")
-        st.stop()
-
-def go(page_name: str):
-    st.session_state.nav_page = page_name
-    st.rerun()
+def envelope_by_id(case_data: dict, env_id: int) -> dict:
+    return next(e for e in case_data["envelopes"] if e["id"] == env_id)
 
 # ---------------------------
 # Boot
 # ---------------------------
-content = load_content()
 init_state()
 
+cases = list_cases()
+if not cases:
+    st.error("Nenhum caso encontrado em content/cases/. Adicione ao menos um JSON.")
+    st.stop()
+
+# Determine current case
+if st.session_state.case_slug is None:
+    st.session_state.case_slug = cases[0]["slug"]
+
+selected_case = next((c for c in cases if c["slug"] == st.session_state.case_slug), cases[0])
+case_data = load_case(selected_case["path"])
+case_slug = selected_case["slug"]
+
+# Load images map for this case
 IMG = {
-    "cover": pick_image("cover"),
-    1: pick_image("envelope1"),
-    2: pick_image("envelope2"),
-    3: pick_image("envelope3"),
-    4: pick_image("envelope4"),
-    5: pick_image("envelope5"),
-    6: pick_image("envelope6"),
-    "closing": pick_image("closing"),
+    "cover": pick_image(case_slug, "cover"),
+    1: pick_image(case_slug, "envelope1"),
+    2: pick_image(case_slug, "envelope2"),
+    3: pick_image(case_slug, "envelope3"),
+    4: pick_image(case_slug, "envelope4"),
+    5: pick_image(case_slug, "envelope5"),
+    6: pick_image(case_slug, "envelope6"),
+    "closing": pick_image(case_slug, "closing"),
 }
 
+# Ensure suspects initialized (first load)
+if not st.session_state.suspects:
+    reset_gameplay_for_case(case_data)
+
 # ---------------------------
-# Sticky TOP BAR with always-collapsed popover menu
+# Sticky TOP BAR with menu
 # ---------------------------
 top = st.container()
 with top:
@@ -183,12 +234,28 @@ with top:
         else:
             st.caption(BRAND["tagline"])
     with colC:
-        # Popover always starts collapsed; any action reruns -> closes automatically
         with st.popover("☰ Menu", use_container_width=True):
+            st.markdown("### Caso")
+            options = {c["title"]: c["slug"] for c in cases}
+            titles = list(options.keys())
+            current_title = next((c["title"] for c in cases if c["slug"] == st.session_state.case_slug), titles[0])
+            new_title = st.selectbox("Selecione", titles, index=titles.index(current_title))
+
+            new_slug = options[new_title]
+            if new_slug != st.session_state.case_slug:
+                st.session_state.case_slug = new_slug
+                # recarrega caso e reseta gameplay
+                new_case = next((c for c in cases if c["slug"] == new_slug), cases[0])
+                new_case_data = load_case(new_case["path"])
+                reset_gameplay_for_case(new_case_data)
+                st.session_state.nav_page = "🏠 Início"
+                st.rerun()
+
+            st.divider()
+
             pages = ["🏠 Início", "📦 Envelopes", "🗒️ Caderno", "✅ Decisão", "🔒 Fechamento"]
             current = st.session_state.nav_page
             idx = pages.index(current) if current in pages else 0
-
             sel = st.radio("Ir para", pages, index=idx)
             if sel != st.session_state.nav_page:
                 st.session_state.nav_page = sel
@@ -207,8 +274,10 @@ with top:
                 if st.button("🗒️ Abrir Caderno", use_container_width=True):
                     st.session_state.nav_page = "🗒️ Caderno"
                     st.rerun()
-                if st.button("🔄 Reiniciar caso", use_container_width=True):
-                    reset_state()
+                if st.button("🔄 Reiniciar este caso", use_container_width=True):
+                    reset_gameplay_for_case(case_data)
+                    st.session_state.nav_page = "🏠 Início"
+                    st.rerun()
 
 st.divider()
 
@@ -216,8 +285,12 @@ st.divider()
 # Pages
 # ---------------------------
 def page_home():
-    st.markdown("# O Incidente da Pousada Aurora")
-    st.caption("Uma investigação narrativa com informação fragmentada.")
+    require_case_loaded(case_data)
+    title = case_data.get("case", {}).get("title", "Caso")
+    subtitle = case_data.get("case", {}).get("subtitle", "Investigação narrativa com decisão bloqueando o fechamento.")
+
+    st.markdown(f"# {title}")
+    st.caption(subtitle)
     safe_image(IMG.get("cover"))
 
     with st.container(border=True):
@@ -236,54 +309,42 @@ def page_home():
         st.success("Caso iniciado. Vá para **Envelopes**.")
 
 def page_envelopes():
+    require_case_loaded(case_data)
     require_started()
+
     st.markdown("## 📦 Envelopes")
     st.caption("Abra na ordem. Confirme leitura para liberar o próximo.")
 
     with st.container(border=True):
         st.markdown("### Ordem de abertura")
-        for env in content["envelopes"]:
+        for env in case_data["envelopes"]:
             env_id = env["id"]
             allowed = can_open(env_id)
             short = env["title"].split("—")[-1].strip()
             label = f"Envelope {env_id} — {short}"
             if allowed:
-                if st.button(f"📩 Abrir {label}", key=f"open_{env_id}", use_container_width=True):
+                if st.button(f"📩 Abrir {label}", key=f"open_{case_slug}_{env_id}", use_container_width=True):
                     st.session_state.current_env = env_id
                     st.rerun()
             else:
                 st.button(f"🔒 {label}", disabled=True, use_container_width=True)
 
     env_id = st.session_state.current_env
-    env = envelope_by_id(content, env_id)
+    env = envelope_by_id(case_data, env_id)
 
     st.divider()
     safe_image(IMG.get(env_id))
     st.markdown(f"### {env['title']}")
     st.markdown(env["body"])
 
-    with st.container(border=True):
-        st.markdown("#### O que observar neste envelope")
-        prompts = {
-            1: "- Isolamento e vulnerabilidades do ambiente\n- Quem tem acesso a quê\n- Lacunas na linha do tempo",
-            2: "- Experiência subjetiva vs. evidência\n- Gatilhos emocionais\n- Ruído narrativo",
-            3: "- Minimizações e exageros\n- Omissões\n- Convergências",
-            4: "- Vínculo físico\n- Janela temporal\n- Dinâmica do crime",
-            5: "- Vetores alternativos (plausível ≠ provável)\n- Incentivos ocultos\n- Quem se beneficia",
-            6: "- Rupturas temporais\n- Coerência final\n- Pós-evento",
-        }
-        st.markdown(prompts.get(env_id, "-"))
-
     st.divider()
 
-    # Confirm reading
     if st.button("✅ Confirmar leitura", use_container_width=True):
         if st.session_state.max_opened_envelope == env_id and env_id < 6:
             st.session_state.max_opened_envelope += 1
         st.toast("Leitura confirmada.")
         st.rerun()
 
-    # Next envelope button (below confirmation)
     next_id = min(env_id + 1, 6)
     next_allowed = can_open(next_id)
     if env_id >= 6:
@@ -293,25 +354,26 @@ def page_envelopes():
             st.session_state.current_env = next_id
             st.rerun()
 
-    # Quick notebook access
     if st.button("🗒️ Abrir Caderno do Investigador", use_container_width=True):
         go("🗒️ Caderno")
 
-    # NEW: CTA on last envelope BEFORE closure/answer -> go to decision page
+    # CTA: final do envelope 6 -> decisão
     if env_id == 6:
         st.warning("Você chegou ao último envelope. Próximo passo: declarar sua conclusão.")
         if st.button("✅ Ir para minha decisão", use_container_width=True):
             go("✅ Decisão")
 
     with st.popover("🧠 Hipótese rápida"):
-        txt = st.text_input("Escreva curto e objetivo", key="hyp_fast")
+        txt = st.text_input("Escreva curto e objetivo", key=f"hyp_fast_{case_slug}")
         if st.button("Salvar hipótese", use_container_width=True) and txt.strip():
             st.session_state.hypotheses.append({"at": datetime.now().isoformat(), "text": txt.strip()})
             st.toast("Hipótese registrada.")
             st.rerun()
 
 def page_notebook():
+    require_case_loaded(case_data)
     require_started()
+
     st.markdown("## 🗒️ Caderno do Investigador")
     st.caption("Hipóteses provisórias. Mudança de opinião é maturidade analítica.")
 
@@ -335,7 +397,7 @@ def page_notebook():
     st.divider()
     with st.container(border=True):
         st.markdown("### 🕒 Linha do tempo")
-        with st.form("timeline_form", clear_on_submit=True):
+        with st.form(f"timeline_form_{case_slug}", clear_on_submit=True):
             t = st.text_input("Evento (ex: 00h05 — discussão na recepção)")
             ok = st.form_submit_button("Adicionar")
             if ok and t.strip():
@@ -358,20 +420,22 @@ def page_notebook():
                 "Status",
                 ["Neutro", "Suspeito", "Prioritário", "Descartado"],
                 index=["Neutro", "Suspeito", "Prioritário", "Descartado"].index(data["status"]),
-                key=f"status_{name}",
+                key=f"status_{case_slug}_{name}",
             )
             st.session_state.suspects[name]["status"] = new_status
             st.session_state.suspects[name]["notes"] = st.text_area(
                 "Notas (provas e lógica)",
                 value=data["notes"],
-                key=f"notes_{name}",
+                key=f"notes_{case_slug}_{name}",
                 height=80,
                 placeholder="Ex: Digitais na arma + janela temporal + ruptura narrativa…",
             )
             st.divider()
 
 def page_decision():
+    require_case_loaded(case_data)
     require_started()
+
     st.markdown("## ✅ Decisão final")
     st.caption("O fechamento oficial só libera depois da sua conclusão.")
 
@@ -381,13 +445,11 @@ def page_decision():
 
     st.warning("Momento da decisão: preencha tudo. Sem campos vazios.")
 
+    suspects_list = [""] + list(st.session_state.suspects.keys()) + ["Outro/Indeterminado"]
+
     with st.container(border=True):
-        with st.form("decision_form"):
-            culprit = st.selectbox(
-                "Quem é o culpado?",
-                ["", "Daniel Moreira", "Laura Moreira", "Proprietário (Sr. Álvaro)", "Outro/Indeterminado"],
-                index=0,
-            )
+        with st.form(f"decision_form_{case_slug}"):
+            culprit = st.selectbox("Quem é o culpado?", suspects_list, index=0)
             method = st.text_input("Como foi o crime? (método/objeto/dinâmica)")
             motive = st.text_input("Qual foi o motivo?")
             reasoning = st.text_area(
@@ -422,7 +484,9 @@ def page_decision():
             st.write(d["reasoning"])
 
 def page_closing():
+    require_case_loaded(case_data)
     require_started()
+
     st.markdown("## 🔒 Fechamento Oficial do Caso")
     if not st.session_state.decision_submitted:
         st.info("Bloqueado até você enviar sua decisão.")
@@ -432,10 +496,10 @@ def page_closing():
     st.markdown("### A verdade não espera por consenso.")
 
     with st.container(border=True):
-        st.markdown(f"## {content['closing']['title']}")
-        st.markdown(content["closing"]["body"])
+        st.markdown(f"## {case_data['closing']['title']}")
+        st.markdown(case_data["closing"]["body"])
 
-    st.caption("Fim do caso. Reinicie para jogar novamente com outra hipótese.")
+    st.caption("Fim do caso. Troque de caso no Menu (☰) para jogar outro.")
 
 # ---------------------------
 # Router
