@@ -1,40 +1,67 @@
+# app.py
+# Pousada Aurora — Investigação (Streamlit)
+# Versão polida: capa, imagens por envelope, progresso, UX premium, decisão ritualizada, fechamento bloqueado.
+
 import json
-import streamlit as st
 from pathlib import Path
 from datetime import datetime
 
+import streamlit as st
+
+# ---------------------------
+# Config
+# ---------------------------
 st.set_page_config(
     page_title="Pousada Aurora — Investigação",
     page_icon="🕵️",
     layout="wide",
+    initial_sidebar_state="expanded",
 )
 
-CONTENT_PATH = Path(__file__).parent / "content" / "envelopes_ptbr.json"
+ROOT = Path(__file__).parent
+CONTENT_PATH = ROOT / "content" / "envelopes_ptbr.json"
+ASSETS = ROOT / "assets" / "images"
 
-def load_content():
+# Nomes esperados das imagens (coloque arquivos com esses nomes em assets/images/)
+IMG = {
+    "cover": ASSETS / "cover.jpg",
+    1: ASSETS / "envelope1.jpg",
+    2: ASSETS / "envelope2.jpg",
+    3: ASSETS / "envelope3.jpg",
+    4: ASSETS / "envelope4.jpg",
+    5: ASSETS / "envelope5.jpg",
+    6: ASSETS / "envelope6.jpg",
+    "closing": ASSETS / "closing.jpg",
+}
+
+BRAND = {
+    "studio": "Aurora Narrative Games",
+    "tagline": "Experiência de investigação. Decida antes da verdade.",
+}
+
+
+# ---------------------------
+# Helpers
+# ---------------------------
+def load_content() -> dict:
+    if not CONTENT_PATH.exists():
+        st.error(
+            f"Arquivo de conteúdo não encontrado: {CONTENT_PATH}\n\n"
+            "Crie content/envelopes_ptbr.json (use o JSON que você já montou)."
+        )
+        st.stop()
     with open(CONTENT_PATH, "r", encoding="utf-8") as f:
         return json.load(f)
 
-def init_state():
-    if "initialized" not in st.session_state:
-        st.session_state.initialized = True
-        st.session_state.started = False
-        st.session_state.max_opened_envelope = 0
-        st.session_state.notes = ""
-        st.session_state.timeline = []
-        st.session_state.suspects = {
-            "Daniel Moreira": {"status": "Neutro", "notes": ""},
-            "Laura Moreira": {"status": "Neutro", "notes": ""},
-            "Proprietário (Sr. Álvaro)": {"status": "Neutro", "notes": ""},
-        }
-        st.session_state.decision_submitted = False
-        st.session_state.decision = {
-            "culprit": "",
-            "method": "",
-            "motive": "",
-            "reasoning": "",
-            "submitted_at": None,
-        }
+
+def safe_image(path: Path, caption: str | None = None, height: int | None = None):
+    """Renderiza imagem se existir; caso contrário, ignora sem quebrar o app."""
+    if path and path.exists():
+        st.image(str(path), use_container_width=True, caption=caption)
+    else:
+        # Mantém o layout sem poluir demais
+        st.caption("")
+
 
 def badge(status: str) -> str:
     m = {
@@ -45,115 +72,318 @@ def badge(status: str) -> str:
     }
     return m.get(status, "⚪")
 
+
+def init_state():
+    if "initialized" in st.session_state:
+        return
+
+    st.session_state.initialized = True
+    st.session_state.started = False
+    st.session_state.current_env = 1
+    st.session_state.max_opened_envelope = 0
+
+    st.session_state.notes = ""
+    st.session_state.timeline = []  # list[{"at": iso, "event": str}]
+    st.session_state.hypotheses = []  # list[{"at": iso, "text": str}]
+
+    st.session_state.suspects = {
+        "Daniel Moreira": {"status": "Neutro", "notes": ""},
+        "Laura Moreira": {"status": "Neutro", "notes": ""},
+        "Proprietário (Sr. Álvaro)": {"status": "Neutro", "notes": ""},
+    }
+
+    st.session_state.decision_submitted = False
+    st.session_state.decision = {
+        "culprit": "",
+        "method": "",
+        "motive": "",
+        "reasoning": "",
+        "submitted_at": None,
+    }
+
+
+def reset_state():
+    for k in list(st.session_state.keys()):
+        del st.session_state[k]
+    st.rerun()
+
+
+def envelope_by_id(content: dict, env_id: int) -> dict:
+    return next(e for e in content["envelopes"] if e["id"] == env_id)
+
+
+def can_open(env_id: int) -> bool:
+    return env_id <= st.session_state.max_opened_envelope
+
+
+def all_unlocked() -> bool:
+    return st.session_state.max_opened_envelope >= 6
+
+
+def require_started():
+    if not st.session_state.started:
+        st.warning("Inicie o caso pelo menu lateral para acessar esta área.")
+        st.stop()
+
+
+# ---------------------------
+# Content + State
+# ---------------------------
 content = load_content()
 init_state()
 
-# ---------- SIDEBAR ----------
+# ---------------------------
+# Minimal styling (Streamlit-safe)
+# ---------------------------
+st.markdown(
+    """
+<style>
+/* Slightly tighten default spacing and improve typography rhythm */
+.block-container { padding-top: 1.25rem; padding-bottom: 2rem; }
+h1, h2, h3 { letter-spacing: -0.2px; }
+[data-testid="stSidebar"] { padding-top: 1rem; }
+.smallcaps { font-variant: small-caps; letter-spacing: 0.8px; }
+.muted { opacity: 0.78; }
+</style>
+""",
+    unsafe_allow_html=True,
+)
+
+# ---------------------------
+# Sidebar
+# ---------------------------
 with st.sidebar:
-    st.markdown("### 🕵️ Pousada Aurora")
-    st.caption("Investigação narrativa com abertura sequencial de evidências.")
+    st.markdown("## 🕵️ Pousada Aurora")
+    st.caption(BRAND["tagline"])
+
+    st.divider()
 
     if not st.session_state.started:
-        st.info("Clique em **Iniciar caso** para começar.")
+        st.info("Clique para iniciar e liberar o Envelope 1.")
         if st.button("▶️ Iniciar caso", use_container_width=True):
             st.session_state.started = True
             st.session_state.max_opened_envelope = 1
+            st.session_state.current_env = 1
             st.rerun()
     else:
-        st.success("Caso em andamento.")
-        st.write(f"**Envelopes liberados:** 1 → {st.session_state.max_opened_envelope}")
+        st.success("Caso em andamento")
+        prog = st.session_state.max_opened_envelope / 6
+        st.progress(prog, text=f"Progresso da investigação: {int(prog*100)}%")
+
+        cols = st.columns(2)
+        with cols[0]:
+            st.metric("Envelopes", f"{st.session_state.max_opened_envelope}/6")
+        with cols[1]:
+            st.metric("Decisão", "✅" if st.session_state.decision_submitted else "—")
 
         if st.button("🔄 Reiniciar caso", use_container_width=True):
-            for k in list(st.session_state.keys()):
-                del st.session_state[k]
-            st.rerun()
+            reset_state()
 
     st.divider()
+
     st.markdown("### 📌 Suspeitos")
     for name, data in st.session_state.suspects.items():
         st.write(f"{badge(data['status'])} **{name}** — {data['status']}")
 
     st.divider()
     st.markdown("### 🧠 Regras rápidas")
-    st.caption("1) Abra envelopes na ordem. 2) Registre hipóteses. 3) Envie sua decisão antes do fechamento.")
+    st.caption("1) Abra na ordem. 2) Anote hipóteses. 3) Decida antes do fechamento.")
 
-# ---------- MAIN ----------
-st.title(content.get("case_title", "Caso"))
+    st.divider()
+    st.caption(f"© {BRAND['studio']}")
 
+# ---------------------------
+# Main Layout
+# ---------------------------
+if not st.session_state.started:
+    left, right = st.columns([0.58, 0.42], gap="large")
+    with left:
+        st.markdown("# O Incidente da Pousada Aurora")
+        st.markdown(
+            """
+<div class="muted">
+Uma investigação narrativa com informação fragmentada.
+Você só verá o fechamento oficial depois de declarar sua conclusão.
+</div>
+""",
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            """
+### Como funciona
+- Você recebe **envelopes** com contexto, depoimentos e provas.
+- As informações são liberadas em **ordem controlada**.
+- Você registra hipóteses, prioriza suspeitos e toma uma decisão final.
+- O **fechamento oficial** fica bloqueado até você enviar sua conclusão.
+
+⚠️ **Regra central**  
+Sem atalhos: o valor do jogo está na disciplina analítica.
+"""
+        )
+
+        st.info("Quando estiver pronto, clique em **Iniciar caso** na barra lateral.")
+    with right:
+        safe_image(IMG["cover"])
+        with st.container(border=True):
+            st.markdown("### Preparação")
+            st.markdown(
+                "- 60 a 90 minutos\n"
+                "- Ambiente silencioso\n"
+                "- Sem multitarefa\n"
+                "- Você contra seus próprios vieses"
+            )
+    st.stop()
+
+# Tabs
 tabs = st.tabs(["📦 Envelopes", "🗒️ Caderno", "✅ Decisão", "🔒 Fechamento"])
 
-# ---------- TAB 1: ENVELOPES ----------
+# ---------------------------
+# TAB 1 — Envelopes
+# ---------------------------
 with tabs[0]:
-    if not st.session_state.started:
-        st.warning("Inicie o caso pelo menu lateral.")
-    else:
-        left, right = st.columns([0.35, 0.65], gap="large")
+    require_started()
 
-        with left:
-            st.subheader("Ordem de abertura")
-            for env in content["envelopes"]:
-                env_id = env["id"]
-                allowed = env_id <= st.session_state.max_opened_envelope
-                label = f"Envelope {env_id}"
-                if allowed:
-                    if st.button(f"📩 Abrir {label}", key=f"open_{env_id}", use_container_width=True):
-                        st.session_state.current_env = env_id
-                else:
-                    st.button(f"🔒 {label} (bloqueado)", disabled=True, use_container_width=True)
+    top_left, top_right = st.columns([0.55, 0.45], gap="large")
+    with top_left:
+        st.markdown("## 📦 Envelopes")
+        st.caption("Abra na ordem. Confirme leitura para liberar o próximo.")
+    with top_right:
+        prog = st.session_state.max_opened_envelope / 6
+        st.progress(prog, text=f"Progresso: {int(prog*100)}%")
 
-            st.divider()
-            st.caption("Liberação progressiva: ao confirmar leitura, libera o próximo.")
+    left, right = st.columns([0.33, 0.67], gap="large")
 
-        with right:
-            env_id = st.session_state.get("current_env", 1)
-            env = next(e for e in content["envelopes"] if e["id"] == env_id)
+    with left:
+        st.markdown("### Ordem de abertura")
 
-            st.subheader(env["title"])
-            st.markdown(env["body"])
+        for env in content["envelopes"]:
+            env_id = env["id"]
+            allowed = can_open(env_id)
+            active = (st.session_state.current_env == env_id)
 
-            st.divider()
-            col_a, col_b = st.columns([0.5, 0.5])
-
-            with col_a:
-                if st.button("✅ Confirmar leitura", use_container_width=True):
-                    if st.session_state.max_opened_envelope == env_id and env_id < 6:
-                        st.session_state.max_opened_envelope += 1
-                    st.toast("Leitura confirmada. Próximo envelope liberado (se aplicável).")
+            if allowed:
+                label = f"{'➡️ ' if active else ''}Envelope {env_id}"
+                if st.button(f"📩 {label}", key=f"btn_env_{env_id}", use_container_width=True):
+                    st.session_state.current_env = env_id
                     st.rerun()
+            else:
+                st.button(f"🔒 Envelope {env_id} (bloqueado)", disabled=True, use_container_width=True)
 
-            with col_b:
-                st.button("🧭 Voltar ao topo", use_container_width=True)
+        st.divider()
 
-# ---------- TAB 2: NOTEBOOK ----------
-with tabs[1]:
-    if not st.session_state.started:
-        st.warning("Inicie o caso para usar o caderno.")
-    else:
-        c1, c2 = st.columns([0.55, 0.45], gap="large")
-
-        with c1:
-            st.subheader("🗒️ Notas gerais do investigador")
-            st.session_state.notes = st.text_area(
-                "Registre hipóteses, contradições, dúvidas e próximos passos.",
-                value=st.session_state.notes,
-                height=260,
+        with st.container(border=True):
+            st.markdown("### Dica operacional")
+            st.markdown(
+                "- Separe **fato** de **interpretação**\n"
+                "- Priorize **prova física** sobre discurso\n"
+                "- Reavalie hipóteses a cada envelope"
             )
 
-            st.subheader("🕒 Linha do tempo")
+    with right:
+        env_id = st.session_state.current_env
+        env = envelope_by_id(content, env_id)
+
+        # Envelope header with image
+        safe_image(IMG.get(env_id))
+        st.markdown(f"## {env['title']}")
+        st.markdown(env["body"])
+
+        st.divider()
+        with st.container(border=True):
+            st.markdown("### O que observar neste envelope")
+            prompts = {
+                1: "- Isolamento e vulnerabilidades do ambiente\n- Quem tem acesso a quê\n- Lacunas na linha do tempo",
+                2: "- O que é experiência subjetiva vs. evidência\n- Gatilhos emocionais\n- Onde pode haver ruído narrativo",
+                3: "- Minimizações e exageros\n- Omissões úteis\n- Convergências entre versões",
+                4: "- Vínculo físico\n- Janela temporal\n- Dinâmica (luta vs. golpe único)",
+                5: "- Vetores alternativos (plausível ≠ provável)\n- Incentivos ocultos\n- Quem se beneficia do ruído",
+                6: "- Rupturas temporais\n- Comportamento pós-evento\n- Coerência final da narrativa",
+            }
+            st.markdown(prompts.get(env_id, "-"))
+
+        st.divider()
+        c1, c2, c3 = st.columns([0.36, 0.36, 0.28])
+        with c1:
+            if st.button("✅ Confirmar leitura", use_container_width=True):
+                # Libera próximo envelope se estiver no limite atual
+                if st.session_state.max_opened_envelope == env_id and env_id < 6:
+                    st.session_state.max_opened_envelope += 1
+                st.toast("Leitura confirmada. Próximo envelope liberado (se aplicável).")
+                st.rerun()
+        with c2:
+            if st.button("🗒️ Anotar hipótese rápida", use_container_width=True):
+                st.session_state._show_quick_note = True
+        with c3:
+            st.caption("")
+
+        if st.session_state.get("_show_quick_note", False):
+            with st.container(border=True):
+                st.markdown("### Hipótese rápida")
+                txt = st.text_input("Digite uma hipótese/insight e pressione Enter", key="quick_hyp")
+                if txt and txt.strip():
+                    st.session_state.hypotheses.append({"at": datetime.now().isoformat(), "text": txt.strip()})
+                    st.session_state._show_quick_note = False
+                    st.toast("Hipótese registrada.")
+                    st.rerun()
+                st.caption("Dica: escreva curto e objetivo. Você vai revisitar isso no Caderno.")
+
+# ---------------------------
+# TAB 2 — Caderno
+# ---------------------------
+with tabs[1]:
+    require_started()
+
+    st.markdown("## 🗒️ Caderno do Investigador")
+    st.caption("Registre hipóteses provisórias. Errar cedo é barato. Errar tarde é caro.")
+
+    c1, c2 = st.columns([0.56, 0.44], gap="large")
+
+    with c1:
+        with st.container(border=True):
+            st.markdown("### Hipóteses provisórias (podem mudar)")
+            st.session_state.notes = st.text_area(
+                "Use isso como sua sala de guerra: hipóteses, contradições, perguntas em aberto.",
+                value=st.session_state.notes,
+                height=220,
+            )
+
+        st.divider()
+
+        with st.container(border=True):
+            st.markdown("### 🧩 Hipóteses rápidas registradas")
+            if not st.session_state.hypotheses:
+                st.caption("Nenhuma hipótese rápida registrada ainda.")
+            else:
+                for item in reversed(st.session_state.hypotheses[-12:]):
+                    st.markdown(f"- {item['text']}")
+
+        st.divider()
+
+        with st.container(border=True):
+            st.markdown("### 🕒 Linha do tempo (operacional)")
             with st.form("timeline_form", clear_on_submit=True):
                 t = st.text_input("Evento (ex: 00h05 — discussão na recepção)")
                 submitted = st.form_submit_button("Adicionar evento")
                 if submitted and t.strip():
                     st.session_state.timeline.append({"at": datetime.now().isoformat(), "event": t.strip()})
                     st.toast("Evento adicionado.")
-            if st.session_state.timeline:
-                for i, item in enumerate(reversed(st.session_state.timeline), start=1):
-                    st.write(f"{i}. {item['event']}")
+                    st.rerun()
 
-        with c2:
-            st.subheader("🎯 Gestão de suspeitos")
+            if st.session_state.timeline:
+                for i, item in enumerate(reversed(st.session_state.timeline[-12:]), start=1):
+                    st.write(f"{i}. {item['event']}")
+            else:
+                st.caption("Sem eventos registrados ainda.")
+
+    with c2:
+        with st.container(border=True):
+            st.markdown("### 🎯 Gestão de suspeitos")
+            st.caption("Seja disciplinado: status sem nota é palpite.")
+
             for name, data in st.session_state.suspects.items():
-                st.markdown(f"**{name}**")
+                st.markdown(f"**{name}** {badge(data['status'])}")
+
                 new_status = st.selectbox(
                     "Status",
                     ["Neutro", "Suspeito", "Prioritário", "Descartado"],
@@ -161,55 +391,79 @@ with tabs[1]:
                     key=f"status_{name}",
                 )
                 st.session_state.suspects[name]["status"] = new_status
+
                 new_notes = st.text_area(
-                    "Notas sobre este suspeito",
+                    "Notas (provas e lógica)",
                     value=data["notes"],
                     key=f"notes_{name}",
                     height=90,
+                    placeholder="Ex: Digitais na arma + janela temporal + ruptura narrativa…",
                 )
                 st.session_state.suspects[name]["notes"] = new_notes
                 st.divider()
 
-# ---------- TAB 3: DECISION ----------
+        with st.container(border=True):
+            st.markdown("### 🧭 Checklist de qualidade")
+            st.markdown(
+                "- Minha hipótese **explica as digitais**?\n"
+                "- Minha hipótese **explica o horário**?\n"
+                "- Minha hipótese exige **coincidências**?\n"
+                "- Estou sendo seduzido pelo \"fenômeno\"?"
+            )
+
+# ---------------------------
+# TAB 3 — Decisão
+# ---------------------------
 with tabs[2]:
-    if not st.session_state.started:
-        st.warning("Inicie o caso para decidir.")
-    else:
-        st.subheader("✅ Decisão final (obrigatória antes do fechamento)")
-        st.caption("Você só desbloqueia o Fechamento Oficial depois de enviar sua decisão.")
+    require_started()
 
-        unlocked_all = (st.session_state.max_opened_envelope >= 6)
-        if not unlocked_all:
-            st.warning("Você ainda não liberou todos os envelopes. Termine a leitura para decidir com base completa.")
-        else:
-            with st.form("decision_form"):
-                culprit = st.selectbox(
-                    "Quem é o culpado?",
-                    ["", "Daniel Moreira", "Laura Moreira", "Proprietário (Sr. Álvaro)", "Outro/Indeterminado"],
-                    index=0,
-                )
-                method = st.text_input("Como foi o crime? (método/objeto/dinâmica)")
-                motive = st.text_input("Qual foi o motivo?")
-                reasoning = st.text_area("Justificativa (por que sua hipótese explica melhor as provas?)", height=180)
+    st.markdown("## ✅ Decisão final")
+    st.caption("Você só desbloqueia o Fechamento Oficial depois de declarar sua conclusão.")
 
-                ok = st.form_submit_button("📌 Enviar decisão e desbloquear fechamento")
-                if ok:
-                    if not culprit or not method.strip() or not motive.strip() or not reasoning.strip():
-                        st.error("Preencha todos os campos. Decisão incompleta não desbloqueia o fechamento.")
-                    else:
-                        st.session_state.decision_submitted = True
-                        st.session_state.decision = {
-                            "culprit": culprit,
-                            "method": method.strip(),
-                            "motive": motive.strip(),
-                            "reasoning": reasoning.strip(),
-                            "submitted_at": datetime.now().isoformat(),
-                        }
-                        st.success("Decisão registrada. Fechamento desbloqueado.")
-                        st.rerun()
+    if not all_unlocked():
+        st.warning("Você ainda não liberou todos os envelopes. Confirme leitura até o Envelope 6 para decidir.")
+        st.stop()
 
-        if st.session_state.decision_submitted:
-            st.divider()
+    # Ritual
+    st.warning(
+        "Este é o momento da decisão.\n\n"
+        "Depois de enviada, sua conclusão ficará registrada e o fechamento oficial será liberado."
+    )
+
+    with st.container(border=True):
+        with st.form("decision_form"):
+            culprit = st.selectbox(
+                "Quem é o culpado?",
+                ["", "Daniel Moreira", "Laura Moreira", "Proprietário (Sr. Álvaro)", "Outro/Indeterminado"],
+                index=0,
+            )
+            method = st.text_input("Como foi o crime? (método/objeto/dinâmica)")
+            motive = st.text_input("Qual foi o motivo?")
+            reasoning = st.text_area(
+                "Justificativa (por que sua hipótese explica melhor as provas?)",
+                height=180,
+                placeholder="Use evidência física, janela temporal, coerência narrativa. Evite achismo.",
+            )
+
+            ok = st.form_submit_button("📌 Enviar decisão e desbloquear fechamento")
+            if ok:
+                if not culprit or not method.strip() or not motive.strip() or not reasoning.strip():
+                    st.error("Preencha todos os campos. Decisão incompleta não desbloqueia o fechamento.")
+                else:
+                    st.session_state.decision_submitted = True
+                    st.session_state.decision = {
+                        "culprit": culprit,
+                        "method": method.strip(),
+                        "motive": motive.strip(),
+                        "reasoning": reasoning.strip(),
+                        "submitted_at": datetime.now().isoformat(),
+                    }
+                    st.success("Decisão registrada. Fechamento desbloqueado.")
+                    st.rerun()
+
+    if st.session_state.decision_submitted:
+        st.divider()
+        with st.container(border=True):
             st.markdown("### 📄 Sua decisão registrada")
             d = st.session_state.decision
             st.write(f"**Culpado:** {d['culprit']}")
@@ -218,15 +472,24 @@ with tabs[2]:
             st.write("**Justificativa:**")
             st.write(d["reasoning"])
 
-# ---------- TAB 4: CLOSING ----------
+# ---------------------------
+# TAB 4 — Fechamento
+# ---------------------------
 with tabs[3]:
-    st.subheader("🔒 Fechamento Oficial do Caso")
-    if not st.session_state.started:
-        st.warning("Inicie o caso.")
-    elif not st.session_state.decision_submitted:
+    require_started()
+
+    st.markdown("## 🔒 Fechamento Oficial do Caso")
+
+    if not st.session_state.decision_submitted:
         st.info("Bloqueado até você enviar sua decisão final.")
-    else:
-        st.markdown(f"### {content['closing']['title']}")
+        st.stop()
+
+    safe_image(IMG.get("closing"))
+    st.markdown("### A verdade não espera por consenso.")
+
+    with st.container(border=True):
+        st.markdown(f"## {content['closing']['title']}")
         st.markdown(content["closing"]["body"])
-        st.divider()
-        st.caption("Fim do caso. Se você quiser, reinicie e tente novamente com outra hipótese.")
+
+    st.divider()
+    st.caption("Fim do caso. Reinicie para jogar novamente com outra hipótese.")
