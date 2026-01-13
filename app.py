@@ -34,6 +34,7 @@ st.markdown(
 .block-container { padding-top: 1rem; padding-bottom: 1.25rem; }
 .stButton button { padding: 0.65rem 0.95rem; border-radius: 12px; }
 
+/* Sticky header: first main block sticks */
 .main .block-container > div:first-child {
   position: sticky;
   top: 0;
@@ -57,7 +58,7 @@ st.markdown(
 )
 
 # ---------------------------
-# Helpers — Cases
+# Helpers — Cases / Images
 # ---------------------------
 def list_cases() -> list[dict]:
     if not CASES_DIR.exists():
@@ -77,7 +78,11 @@ def load_case(case_path: Path) -> dict:
     if not case_path.exists():
         st.error(f"Arquivo do caso não encontrado: {case_path}")
         st.stop()
-    return json.loads(case_path.read_text(encoding="utf-8"))
+    try:
+        return json.loads(case_path.read_text(encoding="utf-8"))
+    except Exception as e:
+        st.error(f"Falha ao ler JSON do caso: {case_path}\n\n{e}")
+        st.stop()
 
 def pick_image(case_slug: str, stem: str) -> Path | None:
     base = ASSETS / case_slug
@@ -116,14 +121,15 @@ def init_state():
     st.session_state.case_slug = None
     st.session_state.nav_page = "🏠 Início"
 
-    # Aqui mora o segredo: um estado por caso
-    # state_by_case[slug] = {...gameplay...}
+    # state_by_case[slug] = gameplay state
     st.session_state.state_by_case = {}
 
 def default_case_state(case_data: dict) -> dict:
-    suspects = case_data.get("case", {}).get("suspects") or [
-        "Daniel Moreira", "Laura Moreira", "Proprietário (Sr. Álvaro)"
-    ]
+    # Sem fallback hardcoded: JSON precisa ter case.suspects
+    suspects = case_data.get("case", {}).get("suspects")
+    if not suspects or not isinstance(suspects, list):
+        raise ValueError("JSON do caso precisa ter case.suspects como lista de nomes.")
+
     return {
         "started": False,
         "current_env": 1,
@@ -143,11 +149,36 @@ def default_case_state(case_data: dict) -> dict:
     }
 
 def get_cs(slug: str, case_data: dict) -> dict:
-    """Get case-scoped state (creates if missing)."""
     s = st.session_state.state_by_case
+
     if slug not in s:
         s[slug] = default_case_state(case_data)
-    return s[slug]
+        return s[slug]
+
+    # Sync suspects do state com o JSON do caso atual (evita “vazamento”)
+    json_suspects = case_data.get("case", {}).get("suspects")
+    if not json_suspects or not isinstance(json_suspects, list):
+        raise ValueError("JSON do caso precisa ter case.suspects como lista de nomes.")
+
+    cs = s[slug]
+    state_names = list(cs["suspects"].keys())
+    json_names = list(json_suspects)
+
+    if state_names != json_names:
+        new_map = {}
+        for name in json_names:
+            if name in cs["suspects"]:
+                new_map[name] = cs["suspects"][name]
+            else:
+                new_map[name] = {"status": "Neutro", "notes": ""}
+
+        cs["suspects"] = new_map
+
+        # se a decisão anterior ficou inválida, limpa culpado
+        if cs.get("decision") and cs["decision"].get("culprit") not in (["", "Outro/Indeterminado"] + json_names):
+            cs["decision"]["culprit"] = ""
+
+    return cs
 
 def reset_case(slug: str, case_data: dict):
     st.session_state.state_by_case[slug] = default_case_state(case_data)
@@ -200,7 +231,11 @@ selected_case = next((c for c in cases if c["slug"] == st.session_state.case_slu
 case_data = load_case(selected_case["path"])
 case_slug = selected_case["slug"]
 
-cs = get_cs(case_slug, case_data)
+try:
+    cs = get_cs(case_slug, case_data)
+except Exception as e:
+    st.error(f"Erro ao inicializar o caso '{case_slug}': {e}")
+    st.stop()
 
 IMG = {
     "cover": pick_image(case_slug, "cover"),
@@ -214,7 +249,7 @@ IMG = {
 }
 
 # ---------------------------
-# Sticky TOP BAR with menu
+# Sticky TOP BAR with always-collapsed popover menu
 # ---------------------------
 top = st.container()
 with top:
@@ -224,7 +259,7 @@ with top:
     with colB:
         if cs["started"]:
             prog = cs["max_opened_envelope"] / 6
-            st.progress(prog, text=f"{int(prog*100)}%")
+            st.progress(prog, text=f"{int(prog * 100)}%")
         else:
             st.caption(BRAND["tagline"])
     with colC:
@@ -239,7 +274,6 @@ with top:
 
             if new_slug != case_slug:
                 st.session_state.case_slug = new_slug
-                # Ao trocar caso: nav volta pro início (evita telas “penduradas”)
                 st.session_state.nav_page = "🏠 Início"
                 st.rerun()
 
@@ -255,12 +289,15 @@ with top:
 
             st.divider()
 
-            # Recalcula cs (pois usuário pode ter trocado caso dentro do popover)
-            # (num rerun ele já atualiza, mas isso evita edge-cases em execução linear)
+            # Recalcula "caso ativo" dentro do popover para ações corretas
             active_slug = st.session_state.case_slug
             active_case = next((c for c in cases if c["slug"] == active_slug), cases[0])
             active_data = load_case(active_case["path"])
-            active_cs = get_cs(active_slug, active_data)
+            try:
+                active_cs = get_cs(active_slug, active_data)
+            except Exception as e:
+                st.error(f"Erro no caso '{active_slug}': {e}")
+                st.stop()
 
             if not active_cs["started"]:
                 if st.button("▶️ Iniciar caso", use_container_width=True):
@@ -287,6 +324,7 @@ st.divider()
 # ---------------------------
 def page_home():
     require_case_loaded(case_data)
+
     title = case_data.get("case", {}).get("title", "Caso")
     subtitle = case_data.get("case", {}).get("subtitle", "Investigação narrativa com decisão bloqueando o fechamento.")
 
@@ -349,6 +387,7 @@ def page_envelopes():
 
     next_id = min(env_id + 1, 6)
     next_allowed = can_open(cs, next_id)
+
     if env_id >= 6:
         st.button("➡️ Próximo envelope (fim)", disabled=True, use_container_width=True)
     else:
@@ -388,6 +427,7 @@ def page_notebook():
         )
 
     st.divider()
+
     with st.container(border=True):
         st.markdown("### 🧩 Hipóteses rápidas")
         if not cs["hypotheses"]:
@@ -397,6 +437,7 @@ def page_notebook():
                 st.markdown(f"- {item['text']}")
 
     st.divider()
+
     with st.container(border=True):
         st.markdown("### 🕒 Linha do tempo")
         with st.form(f"timeline_form_{case_slug}", clear_on_submit=True):
@@ -414,6 +455,7 @@ def page_notebook():
             st.caption("Sem eventos ainda.")
 
     st.divider()
+
     with st.container(border=True):
         st.markdown("### 🎯 Suspeitos")
         for name, data in cs["suspects"].items():
@@ -447,8 +489,22 @@ def page_decision():
 
     st.warning("Momento da decisão: preencha tudo. Sem campos vazios.")
 
-    # ⚠️ SELECTBOX FORA DO CARD (fix mobile)
-    suspects_list = [""] + list(cs["suspects"].keys()) + ["Outro/Indeterminado"]
+    # Fonte de verdade: JSON do caso atual
+    json_suspects = case_data.get("case", {}).get("suspects")
+    if not json_suspects or not isinstance(json_suspects, list):
+        st.error("Este caso está sem 'case.suspects' no JSON. Corrija o arquivo do caso.")
+        st.stop()
+
+    # Redundância intencional: sincroniza aqui também
+    if list(cs["suspects"].keys()) != list(json_suspects):
+        new_map = {}
+        for name in json_suspects:
+            new_map[name] = cs["suspects"].get(name, {"status": "Neutro", "notes": ""})
+        cs["suspects"] = new_map
+
+    suspects_list = [""] + list(json_suspects) + ["Outro/Indeterminado"]
+
+    # Fix mobile: selectbox fora do container border/form
     culprit = st.selectbox(
         "Quem é o culpado?",
         suspects_list,
@@ -456,17 +512,10 @@ def page_decision():
         key=f"culprit_{case_slug}",
     )
 
-    # CARD apenas para inputs de texto + botão
     with st.container(border=True):
         with st.form(f"decision_form_{case_slug}"):
-            method = st.text_input(
-                "Como foi o crime? (método / dinâmica)",
-                key=f"method_{case_slug}",
-            )
-            motive = st.text_input(
-                "Qual foi o motivo?",
-                key=f"motive_{case_slug}",
-            )
+            method = st.text_input("Como foi o crime? (método / dinâmica)", key=f"method_{case_slug}")
+            motive = st.text_input("Qual foi o motivo?", key=f"motive_{case_slug}")
             reasoning = st.text_area(
                 "Justificativa (por que sua hipótese explica melhor as provas?)",
                 height=160,
