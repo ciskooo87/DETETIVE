@@ -1,4 +1,4 @@
-# app.py — versão mobile-first (sem tabs; navegação por menu lateral)
+# app.py — mobile-first + UX upgrades (next envelope, quick notebook, auto-collapse sidebar)
 import json
 import io
 import binascii
@@ -15,7 +15,7 @@ st.set_page_config(
     page_title="Pousada Aurora — Investigação",
     page_icon="🕵️",
     layout="wide",
-    initial_sidebar_state="collapsed",
+    initial_sidebar_state="collapsed",  # abre recolhida
 )
 
 ROOT = Path(__file__).parent
@@ -28,32 +28,39 @@ BRAND = {
 }
 
 # ---------------------------
-# CSS — mobile UX
+# CSS — mobile UX + sidebar hide
 # ---------------------------
-st.markdown(
-    """
+def apply_css(hide_sidebar: bool):
+    hide_css = ""
+    if hide_sidebar:
+        # Esconde sidebar completamente (mobile-friendly)
+        hide_css = """
+        [data-testid="stSidebar"] { display: none !important; }
+        [data-testid="stSidebarNav"] { display: none !important; }
+        """
+    st.markdown(
+        f"""
 <style>
-/* Mobile-first spacing */
-.block-container { padding-top: 1rem; padding-bottom: 1.5rem; }
+/* Base spacing */
+.block-container {{ padding-top: 1rem; padding-bottom: 1.5rem; }}
 
-/* Make radio/buttons feel tappable */
-div[role="radiogroup"] label { padding: 8px 10px; border-radius: 10px; }
-.stButton button { padding: 0.6rem 0.9rem; border-radius: 12px; }
+/* Tappable controls */
+div[role="radiogroup"] label {{ padding: 8px 10px; border-radius: 10px; }}
+.stButton button {{ padding: 0.65rem 0.95rem; border-radius: 12px; }}
 
-/* Reduce gigantic headings on mobile */
-@media (max-width: 768px) {
-  h1 { font-size: 1.6rem !important; }
-  h2 { font-size: 1.25rem !important; }
-  h3 { font-size: 1.05rem !important; }
-  .block-container { padding-left: 0.9rem; padding-right: 0.9rem; }
-}
+/* Mobile typography */
+@media (max-width: 768px) {{
+  h1 {{ font-size: 1.6rem !important; }}
+  h2 {{ font-size: 1.25rem !important; }}
+  h3 {{ font-size: 1.05rem !important; }}
+  .block-container {{ padding-left: 0.9rem; padding-right: 0.9rem; }}
+}}
 
-/* Sidebar tweaks */
-[data-testid="stSidebar"] { padding-top: 0.75rem; }
+{hide_css}
 </style>
 """,
-    unsafe_allow_html=True,
-)
+        unsafe_allow_html=True,
+    )
 
 # ---------------------------
 # Helpers
@@ -74,17 +81,6 @@ def pick_image(stem: str) -> Path | None:
         if p.exists():
             return p
     return None
-
-IMG = {
-    "cover": pick_image("cover"),
-    1: pick_image("envelope1"),
-    2: pick_image("envelope2"),
-    3: pick_image("envelope3"),
-    4: pick_image("envelope4"),
-    5: pick_image("envelope5"),
-    6: pick_image("envelope6"),
-    "closing": pick_image("closing"),
-}
 
 def safe_image(path: Path | None, caption: str | None = None):
     if not path or not path.exists():
@@ -108,6 +104,7 @@ def init_state():
     if "initialized" in st.session_state:
         return
     st.session_state.initialized = True
+
     st.session_state.started = False
     st.session_state.current_env = 1
     st.session_state.max_opened_envelope = 0
@@ -131,6 +128,10 @@ def init_state():
         "submitted_at": None,
     }
 
+    # NEW: nav state + sidebar visibility
+    st.session_state.nav_page = "🏠 Início"
+    st.session_state.hide_sidebar = True  # por padrão, escondemos no mobile (pode abrir via botão ☰)
+
 def reset_state():
     for k in list(st.session_state.keys()):
         del st.session_state[k]
@@ -147,19 +148,12 @@ def all_unlocked() -> bool:
 
 def require_started():
     if not st.session_state.started:
-        st.warning("Inicie o caso pelo menu lateral para acessar esta área.")
+        st.warning("Inicie o caso para acessar esta área.")
         st.stop()
 
-def debug_asset(path: Path | None):
-    if path is None:
-        return {"exists": False, "path": None, "size": None, "head": None}
-    exists = path.exists()
-    size = path.stat().st_size if exists else None
-    head = None
-    if exists:
-        b = path.read_bytes()[:16]
-        head = binascii.hexlify(b).decode("utf-8")
-    return {"exists": exists, "path": str(path), "size": size, "head": head}
+def go(page_name: str):
+    st.session_state.nav_page = page_name
+    st.rerun()
 
 # ---------------------------
 # Boot
@@ -167,8 +161,41 @@ def debug_asset(path: Path | None):
 content = load_content()
 init_state()
 
+IMG = {
+    "cover": pick_image("cover"),
+    1: pick_image("envelope1"),
+    2: pick_image("envelope2"),
+    3: pick_image("envelope3"),
+    4: pick_image("envelope4"),
+    5: pick_image("envelope5"),
+    6: pick_image("envelope6"),
+    "closing": pick_image("closing"),
+}
+
+apply_css(st.session_state.hide_sidebar)
+
 # ---------------------------
-# Sidebar — NAV (mobile-friendly)
+# Top bar (works even when sidebar hidden)
+# ---------------------------
+top = st.container()
+with top:
+    colA, colB, colC = st.columns([0.5, 0.25, 0.25])
+    with colA:
+        st.caption(f"© {BRAND['studio']}")
+    with colB:
+        # Quick access menu toggle
+        if st.button("☰ Menu", use_container_width=True):
+            st.session_state.hide_sidebar = not st.session_state.hide_sidebar
+            st.rerun()
+    with colC:
+        if st.session_state.started:
+            if st.button("🗒️ Caderno", use_container_width=True):
+                go("🗒️ Caderno")
+
+st.divider()
+
+# ---------------------------
+# Sidebar (optional; can be hidden by CSS)
 # ---------------------------
 with st.sidebar:
     st.markdown("## 🕵️ Pousada Aurora")
@@ -181,6 +208,10 @@ with st.sidebar:
             st.session_state.started = True
             st.session_state.max_opened_envelope = 1
             st.session_state.current_env = 1
+            st.session_state.nav_page = "📦 Envelopes"
+
+            # NEW: ao iniciar, recolher/hide automaticamente
+            st.session_state.hide_sidebar = True
             st.rerun()
     else:
         st.success("Caso em andamento")
@@ -192,13 +223,13 @@ with st.sidebar:
 
     st.divider()
 
-    # Navigation instead of tabs (solves mobile accessibility)
-    nav = st.radio(
-        "Navegação",
-        ["🏠 Início", "📦 Envelopes", "🗒️ Caderno", "✅ Decisão", "🔒 Fechamento"],
-        index=0 if not st.session_state.started else 1,
-        label_visibility="visible",
-    )
+    # Nav radio - stateful
+    pages = ["🏠 Início", "📦 Envelopes", "🗒️ Caderno", "✅ Decisão", "🔒 Fechamento"]
+    idx = pages.index(st.session_state.nav_page) if st.session_state.nav_page in pages else 0
+    sel = st.radio("Navegação", pages, index=idx)
+    if sel != st.session_state.nav_page:
+        st.session_state.nav_page = sel
+        st.rerun()
 
     st.divider()
     st.markdown("### 📌 Suspeitos")
@@ -206,23 +237,13 @@ with st.sidebar:
         st.write(f"{badge(data['status'])} **{name}** — {data['status']}")
 
     st.divider()
-    with st.expander("🧪 Diagnóstico de imagens (debug)", expanded=False):
-        for key in ["cover", "closing"]:
-            st.write(key, debug_asset(IMG.get(key)))
-        for i in range(1, 7):
-            st.write(f"env{i}", debug_asset(IMG.get(i)))
-
-    st.divider()
     if st.button("🔄 Reiniciar caso", use_container_width=True):
         reset_state()
-
-    st.caption(f"© {BRAND['studio']}")
 
 # ---------------------------
 # Pages
 # ---------------------------
 def page_home():
-    # Mobile-first: single column, no side-by-side
     st.markdown("# O Incidente da Pousada Aurora")
     st.caption("Uma investigação narrativa com informação fragmentada.")
     safe_image(IMG.get("cover"))
@@ -238,22 +259,23 @@ def page_home():
         st.warning("Regra central: você só vê o fechamento **depois de decidir**.")
 
     if not st.session_state.started:
-        st.info("Inicie o caso pelo menu lateral.")
+        st.info("Inicie o caso pelo Menu (☰) e clique em **Iniciar caso**.")
     else:
-        st.success("Caso iniciado. Vá em **Envelopes** para começar.")
+        st.success("Caso iniciado. Vá para **Envelopes**.")
 
 def page_envelopes():
     require_started()
     st.markdown("## 📦 Envelopes")
     st.caption("Abra na ordem. Confirme leitura para liberar o próximo.")
 
-    # Mobile-first: use expander list instead of columns for envelope navigation
+    # Lista de envelopes (mobile-friendly)
     with st.container(border=True):
         st.markdown("### Ordem de abertura")
         for env in content["envelopes"]:
             env_id = env["id"]
             allowed = can_open(env_id)
-            label = f"Envelope {env_id} — {env['title'].split('—')[-1].strip()}"
+            short = env["title"].split("—")[-1].strip()
+            label = f"Envelope {env_id} — {short}"
             if allowed:
                 if st.button(f"📩 Abrir {label}", key=f"open_{env_id}", use_container_width=True):
                     st.session_state.current_env = env_id
@@ -281,27 +303,44 @@ def page_envelopes():
         }
         st.markdown(prompts.get(env_id, "-"))
 
-    c1, c2 = st.columns(2)
-    with c1:
-        if st.button("✅ Confirmar leitura", use_container_width=True):
-            if st.session_state.max_opened_envelope == env_id and env_id < 6:
-                st.session_state.max_opened_envelope += 1
-            st.toast("Leitura confirmada. Próximo envelope liberado (se aplicável).")
+    # Actions: Confirm -> Next envelope -> Quick notebook
+    st.divider()
+
+    # 1) Confirm reading
+    if st.button("✅ Confirmar leitura", use_container_width=True):
+        if st.session_state.max_opened_envelope == env_id and env_id < 6:
+            st.session_state.max_opened_envelope += 1
+        st.toast("Leitura confirmada.")
+        st.rerun()
+
+    # 2) Next envelope button (below confirm)
+    next_id = min(env_id + 1, 6)
+    next_allowed = can_open(next_id)
+    next_label = f"➡️ Próximo envelope (Envelope {next_id})" if env_id < 6 else "➡️ Próximo envelope (fim)"
+    if env_id >= 6:
+        st.button(next_label, disabled=True, use_container_width=True)
+    else:
+        if st.button(next_label, disabled=not next_allowed, use_container_width=True):
+            st.session_state.current_env = next_id
             st.rerun()
-    with c2:
-        with st.popover("🗒️ Hipótese rápida", use_container_width=True):
-            txt = st.text_input("Escreva curto e objetivo", key="hyp_fast")
-            if st.button("Salvar", use_container_width=True) and txt.strip():
-                st.session_state.hypotheses.append({"at": datetime.now().isoformat(), "text": txt.strip()})
-                st.toast("Hipótese registrada.")
-                st.rerun()
+
+    # 3) Quick access notebook
+    if st.button("🗒️ Abrir Caderno do Investigador", use_container_width=True):
+        go("🗒️ Caderno")
+
+    # Bonus: quick hypothesis popover
+    with st.popover("🧠 Hipótese rápida"):
+        txt = st.text_input("Escreva curto e objetivo", key="hyp_fast")
+        if st.button("Salvar hipótese", use_container_width=True) and txt.strip():
+            st.session_state.hypotheses.append({"at": datetime.now().isoformat(), "text": txt.strip()})
+            st.toast("Hipótese registrada.")
+            st.rerun()
 
 def page_notebook():
     require_started()
     st.markdown("## 🗒️ Caderno do Investigador")
-    st.caption("Hipóteses provisórias. Mudança de opinião é sinal de maturidade analítica.")
+    st.caption("Hipóteses provisórias. Mudança de opinião é maturidade analítica.")
 
-    # Mobile-first: stacked sections
     with st.container(border=True):
         st.markdown("### Notas gerais")
         st.session_state.notes = st.text_area(
@@ -427,13 +466,15 @@ def page_closing():
 # ---------------------------
 # Router
 # ---------------------------
-if nav == "🏠 Início":
+page = st.session_state.nav_page
+
+if page == "🏠 Início":
     page_home()
-elif nav == "📦 Envelopes":
+elif page == "📦 Envelopes":
     page_envelopes()
-elif nav == "🗒️ Caderno":
+elif page == "🗒️ Caderno":
     page_notebook()
-elif nav == "✅ Decisão":
+elif page == "✅ Decisão":
     page_decision()
 else:
     page_closing()
