@@ -1,0 +1,50 @@
+{
+  "case": {
+    "slug": "arquivo-ponte-dos-alamos",
+    "title": "O Arquivo da Ponte dos Álamos",
+    "subtitle": "Quando todos os registros são verdadeiros — mas apenas um é lido corretamente",
+    "suspects": [
+      "Eduardo Milaré",
+      "Rosa Coutinho",
+      "Henrique Valença",
+      "Tomás Rieger"
+    ]
+  },
+  "envelopes": [
+    {
+      "id": 1,
+      "title": "Território, Rotina e Tensões Invisíveis",
+      "body": "IDENTIFICAÇÃO DO LOCAL\n\nA Ponte dos Álamos é uma estrutura rodoviária secundária localizada no km 41 da Estrada Estadual 317, ligando dois municípios de médio porte com histórico industrial decadente. Construída em 1984, nunca passou por reforma estrutural integral. Apenas reforços pontuais.\n\nA região ao redor é composta por:\n- Um antigo parque fabril desativado\n- Um pequeno bairro residencial a 2 km da ponte\n- Área de mata rala e um rio de curso lento\n\nCONTEXTO OPERACIONAL\n\nA vítima, Tomás Rieger, 52 anos, era arquivista-chefe do Departamento Regional de Infraestrutura Viária (DRIV). Trabalhava no setor havia 19 anos. Sua função principal era a guarda, catalogação e validação de registros técnicos históricos — plantas, aditivos contratuais, relatórios de inspeção.\n\nRotina semanal da vítima:\n- Segunda a quinta: expediente regular\n- Sexta-feira: revisão de arquivos físicos antigos (atividade voluntária)\n- Finais de semana: deslocamentos frequentes pela região, fotografando estruturas públicas\n\nHISTÓRICO ANTERIOR AO CRIME\n\nNos últimos oito meses, Tomás solicitou três vezes acesso a caixas arquivísticas lacradas desde 1996. Duas solicitações foram negadas por “inconsistência de demanda”. A terceira foi aceita.\n\nRelatos internos indicam que Tomás comentava, de forma casual, que \"muitos números sobrevivem só porque ninguém mais quer lê-los\".\n\nTENSÕES PRÉVIAS\n\n- Discussão registrada entre Tomás e Eduardo Milaré (engenheiro atual do DRIV) sobre a validade de laudos antigos\n- Pedido informal de Rosa Coutinho (diretora administrativa) para que Tomás \"evitasse remexer em documentos sensíveis\"\n- Comentário feito por Henrique Valença (ex-funcionário terceirizado) sobre \"erros enterrados por burocracia\"\n\nEVENTOS APARENTEMENTE IRRELEVANTES\n\n- Tomás alterou seu trajeto habitual de retorno para casa nas últimas três semanas\n- Passou a carregar uma pasta azul, não registrada oficialmente\n- Visitou a Ponte dos Álamos três vezes fora do horário de trabalho\n\nO jogador ainda não sabe o que procurar. Apenas que o cenário é antigo, silencioso e carregado de documentos esquecidos."
+    },
+    {
+      "id": 2,
+      "title": "Depoimentos Imperfeitos e Verdades Laterais",
+      "body": "DEPOIMENTO 01 — EDUARDO MILARÉ (ENGENHEIRO)\n\n\"Eu respeitava o Tomás, claro. Ele era… meticuloso demais, talvez. Sempre voltando a papéis antigos. A ponte? Sim, falamos dela. Mas tecnicamente estava tudo certo. Os números fechavam. Sempre fecharam.\" (pausa) \"Quer dizer… fechavam dentro do que se esperava na época.\"\n\nContradição interna: Eduardo afirma nunca ter revisitado os laudos antigos, mas cita valores específicos sem consulta.\n\nDEPOIMENTO 02 — ROSA COUTINHO (DIRETORA ADMINISTRATIVA)\n\n\"O Tomás era dedicado, ninguém nega. Mas existe hierarquia. Não se pode simplesmente reabrir caixas sem contexto. Ele parecia… inquieto. Falava em ‘responsabilidade moral’. Isso não é linguagem administrativa.\" (risos nervosos) \"Não, nunca pedi que parasse. Só sugeri foco.\"\n\nNota: registros mostram um e-mail de Rosa solicitando a suspensão temporária das revisões.\n\nDEPOIMENTO 03 — HENRIQUE VALENÇA (EX-TERCEIRIZADO)\n\n\"Eles sabiam. Sempre souberam. Eu só fazia o que mandavam. Os números estavam lá, só… ninguém queria somar direito.\" (corrige) \"Quero dizer, somavam, mas liam errado.\"\n\nHenrique se contradiz sobre quando saiu do projeto da ponte: diz 1997 e depois 1999.\n\nDEPOIMENTO 04 — MORADOR LOCAL\n\n\"Via aquele homem fotografando a ponte. Sempre com cuidado, como se estivesse medindo com os olhos. Uma vez comentou que ‘o problema não era o peso, era o intervalo’. Não entendi.\""
+    },
+    {
+      "id": 3,
+      "title": "Laudos Técnicos Transcritos na Íntegra",
+      "body": "LAUDO ESTRUTURAL — 1983\n\nCarga máxima projetada: 24 toneladas\nIntervalo médio de passagem segura: 18 segundos\nMargem de erro admitida: ±12%\n\nADITIVO TÉCNICO — 1996\n\nAlteração de fluxo viário prevista\nRecalibração estatística do intervalo de passagem\nNovo intervalo médio considerado: 12 segundos\n\nObservação: valores mantidos dentro da margem estatística aceitável\n\nINSPEÇÃO DE ROTINA — 2012\n\nNenhuma fissura relevante\nEstrutura compatível com uso atual\n\nNota técnica: inspeção baseada em médias históricas, não em picos\n\nRELATÓRIO INTERNO — 2019\n\nSugestão de revisão documental completa devido a aumento de tráfego sazonal\nRecomendação não executada por ausência de verba\n\nTodos os laudos são válidos. Todos os números são verdadeiros. Mas nenhum documento cruza explicitamente intervalo e peso simultaneamente."
+    },
+    {
+      "id": 4,
+      "title": "O Detalhe Ignorado",
+      "body": "RELEITURA DO ADITIVO DE 1996\n\nO documento altera o intervalo médio de passagem, mas mantém a carga máxima original.\n\nErro comum: assumir que a margem de erro cobre a combinação dos dois fatores.\n\nNa verdade:\n- Margem cobre variação individual\n- Não cobre sobreposição simultânea de pico de peso + redução de intervalo\n\nTomás havia marcado à lápis uma tabela esquecida na página 7.\n\nTabela nunca digitalizada.\n\nEla indica:\n\n‘Probabilidade acumulada de falha estrutural aumenta exponencialmente quando intervalo <14s com carga >20t’\n\nEsse dado nunca foi citado em nenhum relatório posterior.\n\nNada quebra. Nada falha. A ponte funciona — até que a estatística certa se repete vezes suficientes."
+    },
+    {
+      "id": 5,
+      "title": "Saturação: Documentos, Registros e Ruído",
+      "body": "DOCUMENTO 1 — REGISTRO DE ACESSO\n\nMostra que Rosa autorizou acesso às caixas após insistência externa.\n\nDOCUMENTO 2 — FOTOS DE TOMÁS\n\nSequência de caminhões cruzando a ponte em horários específicos.\n\nDOCUMENTO 3 — PLANILHA MANUAL\n\nCálculo feito à mão, cruzando intervalo real medido e peso estimado visualmente.\n\nDOCUMENTO 4 — ÁUDIO PARCIAL\n\nTomás: \"Se isso sair, não é só um erro antigo. É agora.\"\n\nSUSPEITOS SE IGUALAM\n\n- Eduardo assinou laudos recentes\n- Rosa bloqueou revisões\n- Henrique participou da alteração original\n\nTodos perdem algo se o erro vier à tona:\n\n- Carreira\n- Responsabilidade civil\n- Prisão\n\nNada aponta diretamente para o assassinato. Apenas para o silêncio necessário."
+    },
+    {
+      "id": 6,
+      "title": "A Prova Enterrada",
+      "body": "ANÁLISE DO LOCAL DO ÓBITO\n\nTomás foi encontrado morto próximo à ponte.\n\nCausa aparente: queda acidental.\n\nDetalhe técnico menor:\n\nRelógio de pulso parou às 18:12.\n\nRegistro de tráfego mostra:\n\nÀs 18:11, comboio de três caminhões cruzou a ponte com intervalo médio de 9 segundos.\n\nTomás estava fotografando.\n\nEle não foi empurrado.\n\nEle recuou.\n\nPor quê?\n\nPorque entendeu, naquele instante, que a estatística não era futura.\n\nEra imediata.\n\nA pasta azul continha um pedido de divulgação pública.\n\nAssinado por Rosa Coutinho."
+    }
+  ],
+  "closing": {
+    "title": "Conclusão",
+    "body": "Tomás Rieger não precisava morrer para que a ponte caísse. Precisava morrer para que o erro permanecesse estatístico.\n\nRosa Coutinho autorizou o acesso tarde demais. Quando entendeu o que os números diziam, percebeu que a divulgação imediata provocaria interdição, investigação retroativa e responsabilização direta.\n\nTomás, ao medir o intervalo real, percebeu que a repetição já ocorria. Ele não caiu por falha. Caiu porque recuou ao ver o que estava prestes a acontecer.\n\nRosa não empurrou.\n\nEla atrasou.\n\nSe Tomás tivesse vivido, o documento seria protocolado naquela noite.\n\nCom sua morte classificada como acidente, o pedido nunca saiu da pasta.\n\nA ponte segue de pé.\n\nOs números também.\n\nMas agora, você os leu corretamente."
+  }
+}
+
