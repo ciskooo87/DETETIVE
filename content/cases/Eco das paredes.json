@@ -1,0 +1,51 @@
+{
+  "case": {
+    "slug": "o-eco-das-paredes",
+    "title": "O Eco das Paredes",
+    "subtitle": "Alguns crimes continuam falando, mesmo depois do silêncio.",
+    "suspects": [
+      "Helena Duarte",
+      "Marcos Alencar",
+      "Rafael Nogueira",
+      "Luciana Prado",
+      "Otávio Ribeiro",
+      "Daniel Costa"
+    ]
+  },
+  "envelopes": [
+    {
+      "id": 1,
+      "title": "Abertura do Caso",
+      "body": "O corpo de Eduardo Menezes, 42 anos, jornalista investigativo, foi encontrado em seu apartamento no centro da cidade às 6h40 da manhã. A porta estava trancada por dentro. Não havia sinais de arrombamento. O apartamento apresentava desordem moderada: livros no chão, uma cadeira tombada, um copo quebrado próximo à pia. Eduardo foi encontrado no escritório, sentado na cadeira, com um ferimento perfurante no tórax. O celular da vítima não foi localizado. O computador permanecia ligado."
+    },
+    {
+      "id": 2,
+      "title": "Depoimentos Iniciais",
+      "body": "Helena Duarte: \"Eu falei com o Eduardo na noite anterior. Ele parecia cansado, mas normal. Disse que estava perto de fechar uma matéria grande. Não comentou nomes.\"\n\nMarcos Alencar: \"A gente discutiu semanas atrás, sim. Mas isso é rotina de redação. Ele sabia que eu não queria aquela reportagem publicada.\"\n\nLuciana Prado: \"Eu moro no andar de baixo. Ouvi um barulho forte, como algo caindo, mas achei que fosse móvel. Aqui isso acontece.\"\n\nRafael Nogueira: \"Trabalhei com ele anos atrás. Não falávamos mais. Fiquei sabendo da morte pela polícia.\""
+    },
+    {
+      "id": 3,
+      "title": "Laudos e Registros Oficiais",
+      "body": "Laudo de Necropsia nº 4471-B:\nCausa da morte: perfuração cardíaca por objeto perfurocortante.\nHorário estimado do óbito: entre 22h30 e 23h30.\nAusência de sinais de luta corporal prolongada.\n\nRelatório de Perícia de Local:\nPorta principal sem sinais de violação.\nFechadura funcional.\nImpressões digitais parciais não identificadas no copo quebrado.\nComputador ligado, arquivo de texto aberto, não salvo.\n\nRegistro de Câmeras do Prédio:\nElevador registrou entrada da vítima às 21h12.\nNenhum registro de saída posterior."
+    },
+    {
+      "id": 4,
+      "title": "Plot Twist",
+      "body": "A administradora do prédio entregou um registro manual: entre 22h00 e 22h20, houve manutenção elétrica emergencial. As câmeras ficaram inativas por 17 minutos. Um técnico assinou presença, mas o nome não consta em nenhuma empresa contratada. O elevador esteve parado no 7º andar durante esse intervalo."
+    },
+    {
+      "id": 5,
+      "title": "Ambiguidade Máxima",
+      "body": "Novo depoimento de Otávio Ribeiro: \"Eu estava com o Eduardo naquela noite. Saí por volta das dez. Discutimos, sim. Mas ele estava vivo quando fui embora.\" \n\nDocumento bancário anexado mostra transferência recente da conta de Eduardo para um beneficiário identificado apenas como D.C.\n\nDaniel Costa afirma: \"Esse dinheiro não tem nada a ver comigo. O Eduardo me devia.\""
+    },
+    {
+      "id": 6,
+      "title": "Prova Definitiva",
+      "body": "Relatório Técnico de Acesso à Rede Elétrica:\nO cartão utilizado para liberar o painel de energia do prédio pertence a um ex-funcionário: Daniel Costa.\n\nAnálise de Teclado do Computador da Vítima:\nDigitadas às 22h47 as palavras: \"Daniel esteve aqui.\"\nArquivo não salvo por desligamento abrupto."
+    }
+  ],
+  "closing": {
+    "title": "Conclusão do Caso",
+    "body": "Daniel Costa utilizou seu antigo cartão de acesso para desligar temporariamente o sistema elétrico do prédio, criando uma janela sem vigilância. Subiu até o apartamento de Eduardo Menezes, com quem mantinha uma dívida antiga ligada a informações vendidas no passado. A discussão evoluiu rapidamente. Daniel utilizou uma ferramenta curta e perfurante, causando a morte imediata. Antes de morrer, Eduardo tentou registrar a presença do agressor no computador. Daniel deixou o local antes do restabelecimento da energia, explorando a falha planejada. O crime foi premeditado, executado com controle e silêncio. O caso está encerrado."
+  }
+}
