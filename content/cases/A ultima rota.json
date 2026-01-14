@@ -1,0 +1,51 @@
+{
+  "case": {
+    "slug": "a-ultima-rota-do-vale",
+    "title": "A Última Rota do Vale",
+    "subtitle": "Um desaparecimento que nunca foi tratado como crime",
+    "suspects": [
+      "Jonas Ramires",
+      "Helena Duarte",
+      "Paulo Silveira",
+      "Consórcio ValeTrans",
+      "Desconhecido identificado como 'Passageiro Zero'"
+    ]
+  },
+  "envelopes": [
+    {
+      "id": 1,
+      "title": "Envelope 1 — O Território, a Rotina e o Ruído de Fundo",
+      "body": "IDENTIFICAÇÃO DO CASO\n\nNome interno: VR-2217\nData oficial do desaparecimento: 14 de agosto\nLocalização: Vale do Itapiró, eixo rodoviário secundário entre municípios agrícolas de médio porte\nVítima: Marcos Leal, 42 anos, motorista profissional\n\nCONTEXTO OPERACIONAL\n\nO Vale do Itapiró não aparece em mapas turísticos. É uma região de passagem, não de permanência. Caminhões cortam a paisagem com frequência maior que carros de passeio, e ônibus intermunicipais são tratados como extensão da rotina local. Marcos Leal operava uma dessas linhas: a rota 332-B, conhecida informalmente como \"a última do dia\".\n\nA rotina de Marcos era metódica. Saía sempre às 17h40 da garagem da ValeTrans, fazia três paradas regulamentadas, duas não oficiais toleradas, e chegava ao terminal final às 22h10, com variação máxima registrada de sete minutos. Não há histórico de atrasos graves, acidentes ou conflitos registrados em sua ficha funcional.\n\nECOSSISTEMA SOCIAL\n\nMarcos não era figura central em conflitos locais. Morava sozinho, mantinha contato regular com a ex-esposa por mensagens curtas e previsíveis, e frequentava o mesmo bar às sextas-feiras. Nenhuma dívida significativa registrada. Nenhum histórico policial.\n\nTENSÕES PRÉVIAS\n\nApesar da aparente normalidade, o período que antecede o desaparecimento apresenta ruídos. Três semanas antes, houve uma mudança silenciosa na rota: um desvio temporário por causa de obras, nunca oficialmente comunicado aos passageiros. Motoristas receberam instruções verbais, sem registro escrito.\n\nLINHA DO TEMPO PRELIMINAR\n\n— 17h32: Marcos chega à garagem\n— 17h40: Ônibus sai com 11 passageiros registrados\n— 18h55: Última parada urbana confirmada\n— 19h10 a 21h40: trecho rural sem monitoramento\n— 22h10: ônibus não chega ao terminal\n\nEVENTOS APARENTEMENTE IRRELEVANTES\n\nDois dias antes, Marcos solicitou troca de turno para a semana seguinte. Não explicou o motivo. No mesmo dia, um passageiro sem registro comprou bilhete em dinheiro diretamente com ele, prática tolerada mas não documentada.\n\nOBSERVAÇÃO INICIAL\n\nO desaparecimento foi tratado como falha mecânica até o terceiro dia. Nenhuma busca imediata. Nenhum alerta regional. O Vale seguiu funcionando."
+    },
+    {
+      "id": 2,
+      "title": "Envelope 2 — Depoimentos Que Não Cabem em Resumos",
+      "body": "DEPOIMENTO 01 — Helena Duarte (ex-esposa)\n\n\"Ele não era de sumir. Digo, não assim. Às vezes desligava o telefone, mas avisava depois. Naquela semana estava normal. Talvez até mais quieto. Falou algo sobre estrada nova, mas não explicou. Eu não perguntei. A gente já não perguntava muita coisa.\"\n\n(Pausa longa registrada)\n\n\"Ele disse uma frase estranha no domingo. Algo como 'tem gente que entra no ônibus e não quer chegar'. Eu ri. Achei que era cansaço.\"\n\nDEPOIMENTO 02 — Jonas Ramires (fiscal de rota)\n\n\"A 332-B sempre foi tranquila. O desvio não era problema. Todo mundo sabia. Marcos sabia. Ele reclamou uma vez, sim, disse que à noite ficava tudo igual, que não dava pra distinguir curva. Mas isso é comum. Motorista reclama.\"\n\nCorreção posterior:\n\n\"Ele reclamou duas vezes. Talvez três.\"\n\nDEPOIMENTO 03 — Paulo Silveira (mecânico da garagem)\n\n\"O ônibus estava revisado. Freio, motor, tudo dentro. Só uma coisa: a luz interna do fundo falhava às vezes. Nada grave. Passageiro nem percebe.\"\n\nPerguntado se comunicou a falha:\n\n\"A gente anota quando é grave.\"\n\nRELATOS CONVERGENTES\n\nTodos descrevem Marcos como previsível. Nenhum menciona medo explícito. Nenhum relata ameaça direta.\n\nRELATOS DIVERGENTES\n\nA frase citada por Helena não aparece em nenhum outro relato. Jonas nega conversas fora do padrão. Paulo minimiza falhas técnicas.\n\nOBSERVAÇÃO\n\nOs depoimentos parecem tentar preservar normalidade. Como se admitir estranheza implicasse culpa indireta."
+    },
+    {
+      "id": 3,
+      "title": "Envelope 3 — Laudos, Medições e Margens de Erro",
+      "body": "LAUDO TÉCNICO 01 — Veículo\n\nModelo: Ônibus urbano adaptado\nÚltima revisão: 9 dias antes\nCombustível suficiente para 6h adicionais\nSistema elétrico: flutuação intermitente no circuito secundário\n\nNota técnica: falha compatível com perda parcial de iluminação interna, especialmente após 3h contínuas de uso.\n\nLAUDO TÉCNICO 02 — Rodovia\n\nTrecho rural sem iluminação\nDesvio não sinalizado oficialmente\nPontos de parada improvisados detectados por marcas no solo\n\nMARGENS DE ERRO\n\nHorários baseados em relatos indiretos e registros manuais. Erro estimado: ±12 minutos.\n\nLAUDO TÉCNICO 03 — Telefonia\n\nÚltimo sinal do celular de Marcos: 20h47\nLocalização aproximada: km 61 da rota desviada\n\nOBSERVAÇÃO TÉCNICA\n\nÁrea de sombra de sinal conhecida. Não conclusivo.\n\nPOSSÍVEIS LEITURAS\n\n— Pane mecânica seguida de abandono\n— Interferência externa\n— Desvio intencional\n\nNenhuma hipótese eliminada pelos dados."
+    },
+    {
+      "id": 4,
+      "title": "Envelope 4 — O Detalhe Que Muda o Eixo",
+      "body": "REANÁLISE DO DESVIO\n\nO desvio nunca constou em mapas oficiais. Foi criado para caminhões, não ônibus. A curva no km 59 exige redução abrupta.\n\nDETALHE IGNORADO\n\nO laudo elétrico indica falha progressiva, não súbita. A luz do fundo falharia primeiro.\n\nREINTERPRETAÇÃO\n\nPassageiros no fundo estariam em escuridão parcial por até 40 minutos antes do último sinal.\n\nCONTRADIÇÃO\n\nSe ninguém percebeu, é porque ninguém reclamou. Ou porque não havia ninguém.\n\nHIPÓTESE ABERTA\n\nO número real de passageiros pode ter sido menor que o registrado.\n\nO jogador deve reconsiderar quem estava, de fato, no ônibus."
+    },
+    {
+      "id": 5,
+      "title": "Envelope 5 — Saturação: Documentos, Ruído e Hipóteses",
+      "body": "REGISTROS DE BILHETAGEM\n\n11 bilhetes emitidos\n2 pagos em dinheiro, sem nome\n\nNOVO DEPOIMENTO — Funcionária do terminal inicial\n\n\"Teve um homem que entrou direto. Não falou comigo. Foi pro fundo. Marcos deixou.\"\n\nREGISTRO INDIRETO — Posto de combustível\n\nCâmera externa registra ônibus passando às 20h12. Apenas silhuetas dianteiras visíveis.\n\nHIPÓTESES EM CONFLITO\n\n— Passageiro clandestino\n— Conivência do motorista\n— Erro administrativo\n\nTODOS PLAUSÍVEIS\n\nNenhuma hipótese elimina outra. O caso se torna denso demais para atalhos."
+    },
+    {
+      "id": 6,
+      "title": "Envelope 6 — A Prova Que Não Se Oferece",
+      "body": "TRECHO DO LAUDO ELÉTRICO (página 7)\n\n\"Em condição de baixa iluminação traseira, o espelho interno perde função reflexiva adequada. O condutor depende exclusivamente da percepção auditiva.\"\n\nOBSERVAÇÃO PERDIDA NO TEXTO\n\nMarcos tinha audição comprometida no ouvido esquerdo, conforme exame ocupacional de dois anos antes.\n\nCONEXÃO POSSÍVEL\n\nSe alguém entrou ou se moveu no fundo, ele não veria. Nem ouviria.\n\nNada mais é afirmado.\n\nA prova está aqui, mas não se apresenta como conclusão."
+    }
+  ],
+  "closing": {
+    "title": "Reconstrução Final",
+    "body": "Marcos não desviou por vontade própria. O passageiro não registrado nunca quis chegar. A falha elétrica criou um ponto cego. A audição incompleta selou o erro.\n\nCada suspeito cai porque agiu dentro do permitido. A ValeTrans por negligência estrutural. Jonas por normalização do risco. Helena por desconhecimento.\n\nO desaparecimento não foi um ato isolado, mas o resultado lógico de pequenas permissões acumuladas.\n\nNão houve crime clássico. Houve sistema."
+  }
+}
+
