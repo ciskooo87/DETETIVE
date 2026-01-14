@@ -1,0 +1,50 @@
+{
+  "case": {
+    "slug": "cinzas-de-santa-helena",
+    "title": "Cinzas de Santa Helena",
+    "subtitle": "Quando o que deveria permanecer sob custódia vira prova de morte",
+    "suspects": [
+      "Marina Duarte (coordenadora do crematório municipal)",
+      "Eduardo Lemos (engenheiro sanitarista da prefeitura)",
+      "Rafael Coutinho (ex-marido da vítima)",
+      "Lívia Moreira (advogada e herdeira indireta)"
+    ]
+  },
+  "envelopes": [
+    {
+      "id": 1,
+      "title": "Território, Rotina e o Corpo que Não Deveria Existir",
+      "body": "IDENTIFICAÇÃO DO CASO\nMunicípio: Santa Helena do Vale (população aproximada: 68 mil habitantes)\nLocal da descoberta do corpo: Área de resfriamento secundário do Crematório Municipal de Santa Helena\nData da descoberta: 17 de agosto, terça-feira\nHorário oficial do achado: 06h42\nVítima: Helena Moreira Coutinho, 41 anos, professora universitária\n\nCLASSIFICAÇÃO INICIAL\nRegistro preliminar: morte acidental por falha operacional durante procedimento de cremação\nClassificação provisória: óbito pós-morte (sem crime)\n\nCONTEXTO TERRITORIAL\nSanta Helena do Vale é um município médio, com economia baseada em serviços públicos regionais e um polo universitário recente. O crematório municipal, inaugurado há seis anos, é apresentado como símbolo de modernização sanitária e redução de custos funerários. Atende não apenas a cidade, mas outros cinco municípios do entorno mediante convênio.\n\nO crematório opera em regime contínuo, com dois fornos, uma sala de preparação e uma área de resfriamento onde restos são recolhidos antes da pulverização final. O local é considerado de acesso restrito, com controle de entrada por crachá funcional e registro em livro físico.\n\nROTINA DA VÍTIMA\nHelena Moreira Coutinho era professora de ética e políticas públicas na universidade local. Separada há três anos, mantinha rotina previsível: aulas no período da manhã, pesquisa à tarde, retorno para casa por volta das 19h. Não apresentava histórico médico relevante. Dois dias antes da morte, havia participado de uma audiência pública sobre terceirização de serviços municipais, incluindo o próprio crematório.\n\nDESCOBERTA DO CORPO\nSegundo o relatório inicial, durante a abertura do forno 2 para remoção de resíduos da cremação realizada na noite anterior, o operador notou a presença de tecido orgânico não carbonizado em volume incompatível com o procedimento. Ao aprofundar a inspeção, constatou-se a presença de um corpo humano parcialmente queimado, mas com sinais claros de morte anterior ao processo.\n\nO corpo foi identificado como sendo de Helena Moreira Coutinho por meio de documentos encontrados em vestimentas parcialmente preservadas e posterior confirmação datiloscópica.\n\nPRIMEIRAS INCONSISTÊNCIAS\n– O corpo de Helena não constava na lista oficial de cremações agendadas.\n– Não havia registro de entrada do corpo no livro físico.\n– A vítima havia sido vista com vida menos de 12 horas antes do horário estimado da cremação.\n– A família não havia solicitado cremação.\n\nLINHA DO TEMPO PRELIMINAR\n16/08 – 18h10: Helena sai da universidade.\n16/08 – 19h02: Câmeras registram entrada de seu veículo no estacionamento do crematório.\n16/08 – 22h30: Forno 2 inicia ciclo de cremação não identificado.\n17/08 – 06h42: Corpo descoberto.\n\nPONTO DE ANCORAGEM DO CRIME\nApesar da classificação inicial como acidente operacional, a simples existência do corpo naquele local indica ato humano deliberado: alguém inseriu Helena no fluxo de cremação sem registro, sem autorização e antes de sua morte ser oficialmente reconhecida.\n\nO crime existe. A pergunta é quem teve controle suficiente sobre o sistema para fazê-lo parecer um erro."
+    },
+    {
+      "id": 2,
+      "title": "Depoimentos: O Que as Pessoas Dizem Quando Acham que Estão Ajudando",
+      "body": "DEPOIMENTO 01 – MARINA DUARTE\nCargo: Coordenadora do Crematório\n\n\"Eu cheguei cedo naquele dia porque… bem, porque sempre chego. O operador me ligou dizendo que tinha algo errado. Eu pensei que fosse resto metálico, prótese, essas coisas que às vezes passam. Quando vi que era… aquilo… eu só pensei que alguém tinha cometido um erro grave, não um crime. Porque erro a gente corrige, crime destrói tudo.\" (pausa)\n\nMarina afirma que não autorizou nenhuma cremação fora da agenda e que confia no sistema de registros físicos. Diz que a câmera da área externa falhou naquela noite, mas atribui à chuva.\n\nDEPOIMENTO 02 – EDUARDO LEMOS\nCargo: Engenheiro sanitarista responsável pelo sistema\n\n\"Tecnicamente, o forno não decide sozinho. Alguém inicia o ciclo. Mas o sistema permite ciclos manuais para testes. Isso é… normal. Pouca gente entende, mas existe. Se alguém quisesse usar, não precisaria quebrar nada.\" (risos nervosos)\n\nEduardo menciona que Helena o havia confrontado em audiência pública sobre contratos emergenciais. Diz que isso foi \"desagradável, mas parte do jogo\".\n\nDEPOIMENTO 03 – RAFAEL COUTINHO\nRelação: Ex-marido\n\n\"Nós brigávamos, sim. Mas eu não ganharia nada com isso. O apartamento já estava em meu nome desde o divórcio. Ela só… ela mexia com coisas grandes demais. Eu disse pra ela parar. Disse mesmo.\" (corrige) \"Não parar, só… tomar cuidado.\" \n\nRafael afirma não ter estado no crematório naquela noite, mas admite conhecer funcionários antigos.\n\nDEPOIMENTO 04 – LÍVIA MOREIRA\nRelação: Prima e advogada\n\n\"Helena estava prestes a protocolar uma ação. Não posso dizer contra quem. Ela me pediu sigilo absoluto. Se algo acontecesse com ela… bem, ela disse que eu saberia onde procurar.\" (silêncio prolongado)\n\nCONTRADIÇÕES EMERGENTES\n– Marina diz confiar no registro físico, mas admite que o livro fica destrancado.\n– Eduardo normaliza ciclos manuais, mas não explica por que ocorreram fora do horário.\n– Rafael minimiza conflitos, mas revela tentativas de dissuasão.\n– Lívia sugere conhecimento prévio de risco, mas não apresenta documento."
+    },
+    {
+      "id": 3,
+      "title": "Laudos Técnicos: O Que o Corpo Ainda Diz",
+      "body": "LAUDO TANATOSCÓPICO\nResponsável: Instituto Médico-Legal Regional\n\nCausa da morte: Asfixia mecânica por compressão cervical\nTempo estimado da morte: entre 20h e 21h do dia 16/08 (margem de erro: ±45 minutos)\nObservações: Lesões térmicas posteriores à morte. Ausência de fuligem em vias aéreas.\n\nLAUDO DE CREMAÇÃO\nForno 2 – Ciclo iniciado às 22h30\nTemperatura máxima registrada: 780°C\nTempo de exposição: 47 minutos (interrompido)\nObservação técnica: Ciclo interrompido manualmente antes da pulverização final.\n\nCADEIA DE CUSTÓDIA\n– Corpo removido do forno às 07h15\n– Transferido ao IML às 09h40\n– Lacre inicial apresenta microfissura lateral\n\nANÁLISE DE SISTEMAS\nO sistema eletrônico registra ciclo manual autorizado por crachá funcional pertencente a Marina Duarte.\nRegistro físico: inexistente.\n\nINTERPRETAÇÕES POSSÍVEIS\n– Uso indevido de crachá\n– Compartilhamento de credenciais\n– Autorização consciente\n\nO laudo não indica quem, apenas como. O corpo foi morto antes, inserido depois."
+    },
+    {
+      "id": 4,
+      "title": "Recontextualização: Quando o Erro Não é Técnico",
+      "body": "DETALHE IGNORADO\nO crachá de Marina estava registrado como \"em manutenção\" na semana anterior, segundo relatório interno.\n\nRELEITURA DOS DEPOIMENTOS\nMarina afirma confiar no livro físico, mas o livro é o único elemento não rastreável.\nEduardo conhece profundamente os ciclos manuais, mas não possui acesso físico fora do horário.\n\nNOVO CONTEXTO\nHelena investigava contratos emergenciais que permitiam cremações fora do fluxo normal, justificadas por \"risco sanitário\".\n\nHIPÓTESES INVALIDADAS\n– Falha automática: impossível.\n– Erro inocente: incompatível com interrupção manual.\n\nNada se resolve. Tudo muda."
+    },
+    {
+      "id": 5,
+      "title": "Saturação: Documentos, Registros e Ruído",
+      "body": "DOCUMENTO 01 – MINUTA DE DENÚNCIA\nRascunho encontrado no computador de Helena. Cita irregularidades no crematório, incluindo cremações sem registro para ocultação de corpos.\n\nDOCUMENTO 02 – REGISTRO DE ACESSO\nCâmeras externas mostram veículo oficial da prefeitura às 18h55.\n\nNOVO DEPOIMENTO – FUNCIONÁRIO TERCEIRIZADO\n\"A gente faz o que mandam. Às vezes dizem pra não escrever.\" (não assina)\n\nCONFLITO DE HIPÓTESES\n– Marina: acesso e controle, mas alto risco pessoal.\n– Eduardo: conhecimento técnico, mas sem ganho direto.\n– Rafael: motivo emocional, mas sem acesso.\n– Lívia: conhecimento jurídico, mas ausência física.\n\nO volume confunde. Nada é gratuito."
+    },
+    {
+      "id": 6,
+      "title": "A Prova que Sempre Esteve Lá",
+      "body": "DETALHE TÉCNICO DILUÍDO\nO lacre do corpo apresentava microfissura compatível com reaplicação.\n\nCRUZAMENTO\nMarina foi responsável pela guarda dos lacres.\nO crachá em manutenção não deveria registrar acesso – mas registrou.\n\nO QUE ISSO SIGNIFICA\nAlguém utilizou o crachá conscientemente, sabendo que o registro eletrônico seria questionável.\n\nA PROVA NÃO GRITA\nEla espera que alguém conecte custódia, acesso e benefício."
+    }
+  ],
+  "closing": {
+    "title": "Conclusão: Motivo, Método e Oportunidade",
+    "body": "Marina Duarte autorizou e executou a inserção do corpo de Helena no forno.\n\nMOTIVO\nHelena estava prestes a expor um esquema de cremações irregulares que Marina coordenava para ocultar corpos ligados a contratos emergenciais. Se Helena vivesse, Marina perderia carreira, liberdade e identidade profissional.\n\nMÉTODO\nHelena foi asfixiada no estacionamento do crematório, utilizando o acesso facilitado. O corpo foi inserido no forno por ciclo manual, interrompido para simular falha.\n\nOPORTUNIDADE\nMarina tinha controle de acesso, custódia dos lacres e autoridade para circular fora do horário.\n\nPOR QUE OS OUTROS CAEM\nEduardo não tinha acesso físico. Rafael não tinha acesso técnico. Lívia não esteve presente.\n\nO ERRO DO JOGADOR\nAcreditar que o sistema falha sozinho.\n\nO SISTEMA FUNCIONOU. Alguém o usou para matar."
+  }
+}
+
