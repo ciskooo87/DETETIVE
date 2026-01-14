@@ -1,0 +1,51 @@
+{
+  "case": {
+    "slug": "eco-no-corredor-7",
+    "title": "Eco no Corredor 7",
+    "subtitle": "Quando todos ouviram algo — mas ninguém ouviu a mesma coisa.",
+    "suspects": [
+      "Helena Duarte — diretora administrativa do hospital",
+      "Marcos Azevedo — enfermeiro do turno da noite",
+      "Dr. Álvaro Siqueira — cirurgião-chefe",
+      "Lívia Campos — técnica de manutenção predial",
+      "Rafael Nunes — residente do 2º ano"
+    ]
+  },
+  "envelopes": [
+    {
+      "id": 1,
+      "title": "Contexto Incompleto",
+      "body": "Às 02h17 da madrugada, o corpo do Dr. Paulo Meirelles foi encontrado no Corredor 7 do Hospital Santa Irene, uma ala parcialmente interditada para reformas elétricas. A vítima estava caída próxima ao quadro de disjuntores, com um traumatismo craniano severo.\n\nNão havia sinais claros de luta. O hospital seguia operando em regime reduzido. O Corredor 7 deveria estar vazio. Nem todos os registros de acesso funcionavam naquela noite."
+    },
+    {
+      "id": 2,
+      "title": "Depoimentos Não Confiáveis",
+      "body": "— *Eu vi o Dr. Paulo mais cedo*, disse Helena Duarte. *Ele estava nervoso. Disse algo sobre ‘erros que não poderiam vir à tona’.*\n\n— *Ouvi um barulho metálico por volta das duas*, afirmou Marcos Azevedo. *Mas pensei que fosse a obra. Não fui verificar.*\n\n— *Eu não estive naquela ala*, declarou Dr. Álvaro Siqueira. *Meu turno terminou à meia-noite.*\n\n— *Estava consertando o gerador secundário*, disse Lívia Campos. *Se alguém entrou no corredor, não vi.*\n\n— *Cruzei com o Dr. Paulo perto do elevador*, relatou Rafael Nunes. *Ele parecia apressado demais para aquele horário.*"
+    },
+    {
+      "id": 3,
+      "title": "Laudos Frios, mas Ambíguos",
+      "body": "Laudo do IML:\n\n— Hora estimada da morte: entre 01h40 e 02h30.\n— Causa: impacto contundente na região occipital.\n— Objeto compatível: superfície metálica rígida ou queda contra estrutura fixa.\n— Ausência de ferimentos defensivos.\n— Pequenas partículas de poeira isolante encontradas nas mãos da vítima.\n\nRelatório técnico:\n\n— Quadro de disjuntores do Corredor 7 apresentava manutenção recente.\n— Um dos painéis estava aberto no momento da perícia.\n— Falha intermitente no sensor de presença entre 01h e 03h."
+    },
+    {
+      "id": 4,
+      "title": "Plot Twist Estrutural",
+      "body": "Uma auditoria interna revela que o Corredor 7 **não estava oficialmente interditado naquela noite**. A interdição começaria apenas às 06h.\n\nIsso invalida a suposição de que qualquer presença ali fosse necessariamente irregular.\n\nAlém disso, registros mostram que o sensor de presença falhou *antes* da suposta manutenção registrada por Lívia Campos."
+    },
+    {
+      "id": 5,
+      "title": "Saturação e Conflito",
+      "body": "E-mails recuperados indicam que Dr. Paulo havia denunciado desvios de verba ligados à diretoria administrativa.\n\nMensagens apagadas no celular de Marcos sugerem medo de perder o emprego.\n\nDr. Álvaro é confrontado com prontuários alterados, assinados digitalmente por ele — mas feitos enquanto estava em cirurgia.\n\nLívia é pega mentindo sobre o horário exato em que esteve no subsolo.\n\nRafael é visto em câmeras próximas ao Corredor 7 às 02h05, mas o vídeo é granulado e inconclusivo."
+    },
+    {
+      "id": 6,
+      "title": "Prova Técnica Irrefutável (Mas Não Óbvia)",
+      "body": "Análise cruzada:\n\n— A poeira isolante encontrada nas mãos da vítima corresponde a um material específico usado **apenas em manutenções emergenciais**, não na reforma programada.\n— Esse material estava armazenado fora do Corredor 7.\n— O único acesso liberado a esse estoque naquela noite ocorreu às 01h32.\n— O crachá utilizado não ativa sensores de presença.\n\nO crachá pertencia a alguém que *não deveria estar tecnicamente em manutenção naquele horário*."
+    }
+  ],
+  "closing": {
+    "title": "Conclusão",
+    "body": "A chave não era quem tinha mais motivos — vários tinham —, mas **quem tinha acesso funcional invisível**.\n\nHelena Duarte tinha poder, mas nunca esteve fisicamente no local.\nMarcos mentiu por medo, não por culpa.\nDr. Álvaro parecia esconder algo, mas seus álibis técnicos se sustentam.\nRafael estava no andar, mas não no ponto crítico.\n\nLívia Campos, a técnica, usou um crachá administrativo desativado dos sensores para acessar o estoque emergencial. Não para matar — mas para ocultar uma falha elétrica grave causada por ela mesma dias antes.\n\nDr. Paulo a surpreendeu no Corredor 7. O confronto não foi planejado. O empurrão, sim.\n\nNada gritava seu nome. Tudo apenas… ecoava.\n\nE agora, depois de tudo, parece óbvio.\n\nMas não foi."
+  }
+}
+
